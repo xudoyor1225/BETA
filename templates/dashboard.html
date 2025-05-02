@@ -1,0 +1,506 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+
+
+        <!-- Yon panel -->
+
+
+        <!-- Asosiy kontent uchun o'ram -->
+        <div class="main-content-wrapper">
+            <!-- Header -->
+            <header class="main-header">
+                 <div class="header-left">
+                    <button class="menu-toggle-btn" id="menu-toggle" title="Menyuni yig'ish/kengaytirish" aria-label="Menyu"> <!-- Tarjima qilindi -->
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+                <div class="header-right">
+                    <!-- Qidiruv paneli (ixtiyoriy) -->
+                    <!-- <div class="search-bar">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" placeholder="Global qidiruv..." aria-label="Global qidiruv">
+                    </div> -->
+                    <!-- Tezkor harakat tugmalari (agar kerak bo'lsa) -->
+                    <!-- <button class="header-action-icon" title="Ariza yaratish">
+                        <i class="fa-solid fa-plus"></i>
+                    </button> -->
+                    <button class="header-action-icon notifications-btn" title="Bildirishnomalar"> <!-- Tarjima qilindi -->
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="notification-badge" style="display: none;"></span> <!-- Boshida yashirin -->
+                    </button>
+                    <div class="profile-dropdown" title="Profil sozlamalari"> <!-- Tarjima qilindi -->
+                        <img src="https://i.pravatar.cc/40?img=4" alt="Avatar" class="profile-avatar" id="header-avatar">
+                        <!-- Dropdown menyu logikasi qo'shilishi mumkin -->
+                    </div>
+                </div>
+            </header>
+
+            <!-- Sahifa kontenti -->
+            <main class="page-content">
+                <h1 class="page-title">Boshqaruv Paneli</h1> <!-- Tarjima qilindi -->
+                <div class="animate-on-load">
+                    <!-- Statistika kartochkalari -->
+                    <div class="stats-grid">
+                         <div class="stat-card">
+                             <div class="stat-card-header">
+                                 <div class="stat-card-icon-wrapper blue"><i class="fa-solid fa-file-circle-plus"></i></div>
+                                 <div class="stat-card-title">Topshirilgan arizalar (bugun)</div> <!-- Tarjima qilindi -->
+                             </div>
+                             <div class="stat-card-value" data-target="24">0</div>
+                             <div class="stat-card-footer">
+                                 <span class="stat-change positive"><i class="fa-solid fa-arrow-trend-up"></i> +8%</span>
+                                 <span class="stat-period">kechagiga nisbatan</span> <!-- Tarjima qilindi -->
+                             </div>
+                         </div>
+                         <div class="stat-card">
+                             <div class="stat-card-header">
+                                 <div class="stat-card-icon-wrapper green"><i class="fa-solid fa-thumbs-up"></i></div>
+                                 <div class="stat-card-title">Ma'qullangan (oy davomida)</div> <!-- Tarjima qilindi -->
+                             </div>
+                             <div class="stat-card-value" data-target="148">0</div>
+                             <div class="stat-card-footer">
+                                  <span class="stat-change positive"><i class="fa-solid fa-arrow-trend-up"></i> +15%</span>
+                                  <span class="stat-period">oʻtgan oyga nisbatan</span> <!-- Tarjima qilindi -->
+                             </div>
+                         </div>
+                         <div class="stat-card">
+                             <div class="stat-card-header">
+                                 <div class="stat-card-icon-wrapper orange"><i class="fa-solid fa-user-clock"></i></div>
+                                 <div class="stat-card-title">Faol koʻrib chiqilmoqda</div> <!-- Tarjima qilindi -->
+                             </div>
+                             <div class="stat-card-value" data-target="75">0</div>
+                              <div class="stat-card-footer">
+                                  <span class="stat-change negative"><i class="fa-solid fa-arrow-trend-down"></i> -5%</span>
+                                  <span class="stat-period">oʻtgan haftaga nisbatan</span> <!-- Tarjima qilindi -->
+                             </div>
+                         </div>
+                         <div class="stat-card">
+                             <div class="stat-card-header">
+                                 <div class="stat-card-icon-wrapper red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                 <div class="stat-card-title">E'tibor talab qiladi</div> <!-- Tarjima qilindi -->
+                             </div>
+                             <div class="stat-card-value" data-target="12">0</div>
+                             <div class="stat-card-footer">
+                                  <span class="stat-change positive"><i class="fa-solid fa-arrow-trend-up"></i> +2</span>
+                                  <span class="stat-period">oxirgi 24 soatda</span> <!-- Tarjima qilindi -->
+                             </div>
+                         </div>
+                    </div>
+
+                    <!-- So'nggi arizalar jadvali -->
+                    <div class="card-table-wrapper">
+                        <div class="table-header-controls">
+                            <h2 class="table-title">Soʻnggi Arizalar</h2> <!-- Tarjima qilindi -->
+                            <div class="table-filters">
+                                <div class="table-search">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    <input type="text" id="table-search-input" placeholder="Arizalar boʻyicha qidirish..." aria-label="Arizalar boʻyicha qidirish"> <!-- Tarjima qilindi -->
+                                </div>
+                                <div class="table-actions">
+                                    <!-- Keraksiz test tugmalari olib tashlandi -->
+                                    <a href="all_applications.html" class="btn btn-outline-primary btn-sm">Barchasini koʻrish <i class="fa-solid fa-arrow-right"></i></a> <!-- Tarjima qilindi -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="cool-table" id="applications-table">
+                                <thead>
+                                    <tr>
+                                        <!-- Saralash ikonkalari qoldirildi -->
+                                        <th data-sort="applicant">Ariza beruvchi <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
+                                        <th data-sort="scholarship">Stipendiya <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
+                                        <th data-sort="date">Yuborilgan sana <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
+                                        <th data-sort="status">Holati <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
+                                        <th>Amallar</th> <!-- Tarjima qilindi -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Yuklanish indikatori (JS tomonidan boshqariladi) -->
+                                    <tr class="table-placeholder">
+                                         <td colspan="5" style="text-align: center; padding: 50px 0; color: var(--text-light);">
+                                             <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                                             <p>Maʼlumotlar yuklanmoqda...</p> <!-- Tarjima qilindi -->
+                                         </td>
+                                     </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination-wrapper" id="table-pagination">
+                            <!-- Sahifalash JS orqali render qilinadi -->
+                        </div>
+                    </div>
+
+                    <!-- Ariza holatlari bo'yicha grafik -->
+                    <div class="chart-wrapper futuristic-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title"><i class="fa-solid fa-chart-pie"></i> Ariza Holatlari Tahlili</h3> <!-- Tarjima qilindi -->
+                            <div class="chart-actions">
+                                <button class="btn btn-icon btn-transparent" title="Yangilash"><i class="fa-solid fa-rotate"></i></button> <!-- Tarjima qilindi -->
+                            </div>
+                        </div>
+                        <div class="chart-content">
+                            <!-- Yuklanish indikatori -->
+                            <div class="chart-loader" id="applicationsChart-loader">
+                                <div class="spinner">
+                                    <div class="double-bounce1"></div>
+                                    <div class="double-bounce2"></div>
+                                </div>
+                                <span>Maʼlumotlar yuklanmoqda...</span> <!-- Tarjima qilindi -->
+                            </div>
+                            <div class="chart-container" id="chart-container">
+                                <canvas id="applicationsChart"></canvas>
+                            </div>
+                            <!-- Grafik xulosasi -->
+                            <div class="chart-summary" id="chart-summary">
+                                <div class="summary-item">
+                                    <span class="summary-label">Jami</span> <!-- Tarjima qilindi -->
+                                    <span class="summary-value" id="summary-total">--</span>
+                                </div>
+                                <div class="summary-item approved">
+                                    <span class="summary-label">Maʼqullangan</span> <!-- Tarjima qilindi -->
+                                    <span class="summary-value" id="summary-approved">--</span>
+                                </div>
+                                 <div class="summary-item pending">
+                                    <span class="summary-label">Jarayonda</span> <!-- Tarjima qilindi -->
+                                    <span class="summary-value" id="summary-pending">--</span>
+                                </div>
+                                <div class="summary-item rejected">
+                                    <span class="summary-label">Rad etilgan</span> <!-- Tarjima qilindi -->
+                                    <span class="summary-value" id="summary-rejected">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <footer class="main-footer">
+                 <!-- Tarjima qilingan footer -->
+                 🚀 "Shaffof Imkoniyat" Boshqaruv Paneli v1.1 | Halol kelajak uchun <i class="fa-solid fa-heart"></i> bilan yaratilgan | <a href="#">Loyihani qo'llab-quvvatlash</a>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Bildirishnomalar uchun konteyner -->
+    <div class="notifications-container" id="notifications-container"></div>
+
+    <!-- Skriptlar -->
+    <script src="{% static 'js/data.js' %}"></script> <!-- demoApplications, analyticsData, findApplicant, findScholarship shu yerda bo'lishi kerak -->
+    <script src="{% static 'js/script.js' %}"></script> <!-- Global skriptlar (menyu toggle, toast, KPI animatsiyasi) -->
+    <script src="{% static 'js/chart-config.js' %}"></script> <!-- Grafik konfiguratsiyalari -->
+    <!-- Ushbu sahifa uchun maxsus JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+             // Keraksiz console.log olib tashlandi
+
+            // --- FAQAT DASHBOARD SAHIFASI UCHUN KOD ---
+            const tableBody = document.querySelector('#applications-table tbody');
+            const placeholderRow = document.querySelector('#applications-table .table-placeholder');
+            const paginationWrapper = document.getElementById('table-pagination');
+            let currentPage = 1;
+            const rowsPerPage = 5; // Dashboardda kamroq qator ko'rsatish
+            let currentTableData = []; // Filtrlangan/saralangan ma'lumotlar
+            let currentSort = { column: 'date', direction: 'desc' }; // Standart saralash
+
+            // Holatlar uchun tarjima va klasslar/ikonkalar
+             const statusTranslations = {
+                 'Одобрена': 'Ma\'qullangan',
+                 'На рассмотрении': 'Ko\'rib chiqilmoqda',
+                 'Отклонена': 'Rad etilgan',
+                 'Подана': 'Yuborilgan',
+                 'Требует уточнения': 'Aniqlashtirish talab etiladi'
+             };
+             const statusClasses = {
+                 'Одобрена': 'status-approved',
+                 'На рассмотрении': 'status-pending',
+                 'Отклонена': 'status-rejected',
+                 'Подана': 'status-submitted',
+                 'Требует уточнения': 'status-clarification'
+             };
+             const statusIcons = {
+                 'Одобрена': 'fa-solid fa-check-circle',
+                 'На рассмотрении': 'fa-regular fa-clock',
+                 'Отклонена': 'fa-solid fa-times-circle',
+                 'Подана': 'fa-solid fa-paper-plane',
+                 'Требует уточнения': 'fa-solid fa-exclamation-circle'
+             };
+
+
+            // Jadval qatorlarini render qilish
+            function renderTableRows(data) {
+                tableBody.innerHTML = ''; // Jadvalni tozalash
+                 if (!data || data.length === 0) {
+                     // Agar ma'lumot bo'lmasa, xabar chiqarish (tarjima qilingan)
+                     tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px 0; color: var(--text-light);">Hech narsa topilmadi <i class="fa-regular fa-face-sad-tear"></i></td></tr>`;
+                     return;
+                 }
+                const startIndex = (currentPage - 1) * rowsPerPage;
+                const endIndex = startIndex + rowsPerPage;
+                const paginatedData = data.slice(startIndex, endIndex);
+
+                paginatedData.forEach((item, index) => {
+                    // Ariza beruvchi va stipendiyani topish (funksiyalar data.js da bo'lishi kerak)
+                    const applicant = typeof findApplicant === 'function' ? findApplicant(item.applicantId) : null;
+                    const scholarship = typeof findScholarship === 'function' ? findScholarship(item.scholarshipId) : null;
+                    if (!applicant || !scholarship) return; // Agar topilmasa, qatorni o'tkazib yuborish
+
+                    const row = document.createElement('tr');
+                    row.style.opacity = '0'; // Animatsiya uchun
+
+                    const translatedStatus = statusTranslations[item.status] || item.status; // Holatni tarjima qilish
+
+                    row.innerHTML = `
+                        <td>
+                            <div class="applicant-info">
+                                <img src="${applicant.avatar || 'https://i.pravatar.cc/30'}" alt="Avatar" class="applicant-avatar">
+                                <div>
+                                    <span class="applicant-name">${applicant.name}</span>
+                                    <span class="applicant-email">${applicant.email}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${scholarship.name}</td>
+                        <td>${item.date}</td>
+                        <td>
+                            <span class="status-badge ${statusClasses[item.status] || 'status-clarification'}" title="Yangilangan: ${item.updateDate || '-'}"> <!-- Title tarjima qilindi -->
+                                <i class="${statusIcons[item.status] || 'fa-solid fa-question-circle'}"></i> ${translatedStatus}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <!-- Amallar tugmalari (ixtiyoriy) -->
+                                <button class="view-btn" title="Ko'rish"><i class="fa-solid fa-eye"></i></button> <!-- Tarjima qilindi -->
+                                <button class="edit-btn" title="Tahrirlash"><i class="fa-solid fa-pen"></i></button> <!-- Tarjima qilindi -->
+                                <!-- <button class="delete-btn" title="O'chirish"><i class="fa-solid fa-trash-can"></i></button> --> <!-- O'chirish tugmasi ehtiyotkorlik bilan ishlatiladi -->
+                            </div>
+                        </td>`;
+                    tableBody.appendChild(row);
+                    // Qator paydo bo'lish animatsiyasi
+                    setTimeout(() => {
+                        row.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                        row.style.opacity = '1';
+                        row.style.transform = 'translateY(0)';
+                    }, 50 * index);
+                });
+            }
+
+            // Sahifalashni render qilish
+            function renderPagination(totalRows) {
+                 if (!paginationWrapper) return;
+                 paginationWrapper.innerHTML = ''; // Eski sahifalashni tozalash
+                 const totalPages = Math.ceil(totalRows / rowsPerPage);
+                 if (totalPages <= 1) return; // Agar bitta sahifa bo'lsa, ko'rsatmaslik
+
+                 const startRow = (currentPage - 1) * rowsPerPage + 1;
+                 const endRow = Math.min(currentPage * rowsPerPage, totalRows);
+
+                 // Ma'lumot (tarjima qilingan)
+                 const infoSpan = document.createElement('span');
+                 infoSpan.classList.add('pagination-info');
+                 infoSpan.textContent = `${totalRows} ta arizadan ${startRow}-${endRow} koʻrsatilmoqda`;
+                 paginationWrapper.appendChild(infoSpan);
+
+                 const controlsDiv = document.createElement('div');
+                 controlsDiv.classList.add('pagination-controls');
+
+                 // Orqaga tugmasi (tarjima qilingan)
+                 const prevButton = document.createElement('button');
+                 prevButton.classList.add('btn', 'btn-secondary', 'btn-sm');
+                 prevButton.innerHTML = '« Orqaga';
+                 prevButton.disabled = currentPage === 1;
+                 prevButton.addEventListener('click', () => {
+                     if (currentPage > 1) {
+                         currentPage--;
+                         renderTableRows(currentTableData);
+                         renderPagination(totalRows);
+                     }
+                 });
+                 controlsDiv.appendChild(prevButton);
+
+                 // Oldinga tugmasi (tarjima qilingan)
+                 const nextButton = document.createElement('button');
+                 nextButton.classList.add('btn', 'btn-secondary', 'btn-sm');
+                 nextButton.innerHTML = 'Oldinga »';
+                 nextButton.disabled = currentPage === totalPages;
+                 nextButton.addEventListener('click', () => {
+                     if (currentPage < totalPages) {
+                         currentPage++;
+                         renderTableRows(currentTableData);
+                         renderPagination(totalRows);
+                     }
+                 });
+                 controlsDiv.appendChild(nextButton);
+
+                 paginationWrapper.appendChild(controlsDiv);
+            }
+
+            // Ma'lumotlarni saralash
+            function sortData(data, column, direction) {
+                // Saralash logikasi (oldingi javobdan olingan)
+                return [...data].sort((a, b) => {
+                    let valA, valB;
+                    const applicantA = typeof findApplicant === 'function' ? findApplicant(a.applicantId) : null;
+                    const applicantB = typeof findApplicant === 'function' ? findApplicant(b.applicantId) : null;
+                    const scholarshipA = typeof findScholarship === 'function' ? findScholarship(a.scholarshipId) : null;
+                    const scholarshipB = typeof findScholarship === 'function' ? findScholarship(b.scholarshipId) : null;
+
+                    switch(column) {
+                        case 'applicant': valA = applicantA ? applicantA.name.toLowerCase() : ''; valB = applicantB ? applicantB.name.toLowerCase() : ''; break;
+                        case 'scholarship': valA = scholarshipA ? scholarshipA.name.toLowerCase() : ''; valB = scholarshipB ? scholarshipB.name.toLowerCase() : ''; break;
+                        case 'date':
+                            try { valA = new Date(a.date); valB = new Date(b.date); if(isNaN(valA)) valA = new Date(0); if(isNaN(valB)) valB = new Date(0); } catch(e){valA=0; valB=0;} break;
+                        case 'status': valA = a.status.toLowerCase(); valB = b.status.toLowerCase(); break;
+                        default: try { valA = new Date(a.date); valB = new Date(b.date); if(isNaN(valA)) valA = new Date(0); if(isNaN(valB)) valB = new Date(0); } catch(e){valA=0; valB=0;} // Standart sana bo'yicha
+                    }
+                    if (valA < valB) return direction === 'asc' ? -1 : 1;
+                    if (valA > valB) return direction === 'asc' ? 1 : -1;
+                    return 0;
+                 });
+            }
+
+            // Saralash sarlavhalarini yangilash
+            function updateSortHeaders() {
+                tableHeaders.forEach(h => {
+                    h.classList.remove('sort-asc', 'sort-desc'); // Eski klasslarni olib tashlash
+                    if (h.getAttribute('data-sort') === currentSort.column) {
+                        h.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc'); // Joriy klassni qo'shish
+                    }
+                });
+            }
+
+            // Jadvalni initsializatsiya qilish
+            function initTable() {
+                // Keraksiz console.log olib tashlandi
+                if(placeholderRow) placeholderRow.style.display = 'none'; // Yuklanish indikatorini yashirish
+                 // demoApplications data.js da mavjud deb faraz qilinadi
+                 if (typeof demoApplications !== 'undefined') {
+                    currentTableData = sortData(demoApplications, currentSort.column, currentSort.direction);
+                    renderTableRows(currentTableData);
+                    renderPagination(currentTableData.length);
+                    updateSortHeaders(); // Boshlang'ich saralash indikatorlarini o'rnatish
+                    // Keraksiz console.log olib tashlandi
+                 } else {
+                     console.error("Ariza ma'lumotlari (demoApplications) topilmadi!");
+                     tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px 0; color: var(--accent-red);">Maʼlumotlarni yuklashda xatolik yuz berdi.</td></tr>`; // Tarjima qilindi
+                 }
+            }
+
+            // Jadvalni kechikish bilan boshlash
+            setTimeout(initTable, 500); // Kichik kechikish interfeys bloklanishini oldini oladi
+
+            // Qidiruv inputiga event listener qo'shish
+            const searchInput = document.getElementById('table-search-input');
+            if (searchInput && typeof demoApplications !== 'undefined') {
+                searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase().trim();
+                    currentPage = 1; // Qidiruvda birinchi sahifaga qaytish
+                    // Filtrlash logikasi
+                    const filteredData = demoApplications.filter(item => {
+                        const applicant = typeof findApplicant === 'function' ? findApplicant(item.applicantId) : null;
+                        const scholarship = typeof findScholarship === 'function' ? findScholarship(item.scholarshipId) : null;
+                        const translatedStatus = statusTranslations[item.status] || item.status;
+
+                        return (
+                            (applicant && applicant.name.toLowerCase().includes(searchTerm)) ||
+                            (applicant && applicant.email.toLowerCase().includes(searchTerm)) ||
+                            (scholarship && scholarship.name.toLowerCase().includes(searchTerm)) ||
+                            item.status.toLowerCase().includes(searchTerm) || // Original status bo'yicha qidirish
+                            translatedStatus.toLowerCase().includes(searchTerm) || // Tarjima qilingan status bo'yicha qidirish
+                            item.date.includes(searchTerm)
+                        );
+                    });
+                    currentTableData = sortData(filteredData, currentSort.column, currentSort.direction); // Filtrlangan ma'lumotlarni saralash
+                    renderTableRows(currentTableData); // Jadvalni qayta chizish
+                    renderPagination(currentTableData.length); // Sahifalashni yangilash
+                    // Keraksiz console.log olib tashlandi
+                });
+            }
+
+            // Jadval sarlavhalariga saralash uchun event listener'lar
+             const tableHeaders = document.querySelectorAll('#applications-table th[data-sort]');
+             tableHeaders.forEach(header => {
+                 header.addEventListener('click', () => {
+                     const sortColumn = header.getAttribute('data-sort');
+                     let sortDirection = 'asc'; // Standart yo'nalish
+                     if (currentSort.column === sortColumn) {
+                         sortDirection = currentSort.direction === 'asc' ? 'desc' : 'asc'; // Yo'nalishni almashtirish
+                     }
+                     // Keraksiz console.log olib tashlandi
+                     currentSort = { column: sortColumn, direction: sortDirection }; // Joriy saralashni yangilash
+                     currentPage = 1; // Birinchi sahifaga qaytish
+                     // currentTableData (filtrlangan bo'lishi mumkin) yoki barcha ma'lumotlarni saralash
+                     // Qidiruv faol bo'lsa, currentTableData ni, aks holda all data ni saralash kerak
+                     const dataToSort = searchInput.value.trim() ? currentTableData : (typeof demoApplications !== 'undefined' ? demoApplications : []);
+                     currentTableData = sortData(dataToSort, currentSort.column, currentSort.direction); // Saralash
+                     renderTableRows(currentTableData); // Jadvalni qayta chizish
+                     renderPagination(currentTableData.length); // Sahifalashni yangilash
+                     updateSortHeaders(); // Saralash indikatorlarini yangilash
+                 });
+             });
+
+            // Grafikni initsializatsiya qilish (funksiya chart-config.js da)
+             // analyticsData data.js da mavjud deb faraz qilinadi
+             if (typeof initApplicationsStatusChart === 'function' && typeof analyticsData !== 'undefined') {
+                initApplicationsStatusChart('applicationsChart', analyticsData.applicationsByStatus);
+                 // Grafik xulosasini to'ldirish
+                 const summary = analyticsData.applicationsByStatus.data;
+                 document.getElementById('summary-total').textContent = summary.reduce((a, b) => a + b, 0);
+                 document.getElementById('summary-approved').textContent = summary[0]; // Ma'qullangan
+                 document.getElementById('summary-pending').textContent = summary[1] + summary[4]; // Jarayonda + Aniqlashtirish
+                 document.getElementById('summary-rejected').textContent = summary[2]; // Rad etilgan
+             } else {
+                 console.error("Grafikni yaratish uchun funksiya yoki ma'lumotlar topilmadi!");
+                  const chartLoader = document.getElementById('applicationsChart-loader');
+                  if(chartLoader) chartLoader.innerHTML = '<span style="color: var(--accent-red);">Grafikni yuklashda xatolik.</span>'; // Tarjima qilindi
+             }
+
+
+            // Chiqish tugmasi
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if(typeof showToast === 'function') showToast('Siz tizimdan muvaffaqiyatli chiqdingiz.', 'Chiqish', 'info'); // Tarjima qilindi
+                    // Haqiqiy chiqish logikasi:
+                    // window.location.href = '/login.html';
+                });
+            }
+
+            // Bildirishnoma belgisini ko'rsatish (misol)
+            const notificationBadge = document.querySelector('.notification-badge');
+            if (notificationBadge && typeof analyticsData !== 'undefined' && analyticsData.applicationsByStatus.data.length > 4 && analyticsData.applicationsByStatus.data[4] > 0) { // Agar "Aniqlashtirish talab etiladi" arizalari bo'lsa
+                notificationBadge.style.display = 'block';
+                notificationBadge.textContent = analyticsData.applicationsByStatus.data[4]; // Sonini ko'rsatish
+                // CSS orqali stillarni sozlash yaxshiroq, lekin JS da ham mumkin:
+                notificationBadge.style.width = 'auto';
+                notificationBadge.style.height = 'auto';
+                notificationBadge.style.padding = '2px 5px';
+                notificationBadge.style.fontSize = '0.7rem';
+            }
+
+            // Yon panel va headerdagi foydalanuvchi ma'lumotlarini yuklash
+            const currentUserId = 9; // Demo user ID
+            const currentUser = typeof findApplicant === 'function' ? findApplicant(currentUserId) : null;
+            const sidebarAvatar = document.getElementById('sidebar-avatar');
+            const sidebarUserName = document.getElementById('sidebar-user-name');
+            const sidebarUserRole = document.getElementById('sidebar-user-role');
+            const headerAvatar = document.getElementById('header-avatar');
+            const roleTranslations = { 'Супер Админ': 'Super Admin', 'Администратор': 'Administrator', 'Ревьюер': 'Tekshiruvchi', 'Заявитель': 'Ariza beruvchi' }; // Rollarni tarjima qilish
+
+            if (currentUser) {
+                 if (sidebarAvatar) sidebarAvatar.src = currentUser.avatar || `https://ui-avatars.com/api/?name=${currentUser?.name?.split(' ').map(n=>n[0]).join('') || '??'}&background=random&size=40`;
+                 if (headerAvatar) headerAvatar.src = currentUser.avatar || `https://ui-avatars.com/api/?name=${currentUser?.name?.split(' ').map(n=>n[0]).join('') || '??'}&background=random&size=40`;
+                 if (sidebarUserName) sidebarUserName.textContent = currentUser.name || 'Foydalanuvchi';
+                 const translatedRole = roleTranslations[currentUser.role] || currentUser.role;
+                 if (sidebarUserRole) sidebarUserRole.textContent = translatedRole;
+            }
+
+        });
+    </script>
+
+
+{% endblock %}

@@ -1,0 +1,581 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style> /* Modal oyna uchun stillar qoldirildi */
+        .modal { display: none; position: fixed; z-index: 1055; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px); animation: fadeIn 0.3s ease; }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background-color: var(--bg-card); margin: auto; padding: 30px 40px; border: 1px solid var(--border-color); width: 90%; max-width: 700px; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-xl); position: relative; animation: slideUpModal 0.4s var(--transition-ease) forwards; opacity: 0; transform: translateY(20px); }
+        .modal-close { color: var(--text-light); position: absolute; top: 15px; right: 20px; font-size: 1.8rem; font-weight: bold; cursor: pointer; transition: color 0.2s ease, transform 0.2s ease; }
+        .modal-close:hover { color: var(--accent-red); transform: rotate(90deg); }
+        .modal-header h2 { font-size: 1.6rem; margin-bottom: 20px; color: var(--text-dark); }
+        .modal-body { max-height: 65vh; overflow-y: auto; padding-right: 15px; margin-right: -15px; }
+        .modal-footer { margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 10px; }
+    </style>
+
+        <!-- Asosiy kontent uchun o'ram -->
+        <div class="main-content-wrapper">
+            <!-- Header (minimal, keraksiz qismlar olib tashlangan) -->
+             <header class="main-header">
+                 <div class="header-left">
+                     <button class="menu-toggle-btn" id="menu-toggle" title="Menyuni yig'ish/kengaytirish" aria-label="Menyu"> <!-- Tarjima qilindi -->
+                         <i class="fa-solid fa-bars"></i>
+                     </button>
+                 </div>
+                 <div class="header-right">
+                     <!-- Boshqa header elementlari (agar kerak bo'lsa) -->
+                 </div>
+             </header>
+
+            <!-- Sahifa kontenti -->
+            <main class="page-content">
+                <h1 class="page-title">Stipendiyalarni Boshqarish</h1> <!-- Tarjima qilindi -->
+                 <div class="animate-on-load">
+                     <div class="card-table-wrapper">
+                        <div class="table-header-controls">
+                            <h2 class="table-title">Stipendiyalar Roʻyxati</h2> <!-- Tarjima qilindi -->
+                            <div class="table-filters">
+                                <div class="table-search">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    <input type="text" id="manage-sch-search-input" placeholder="Nomi, ta'minotchi bo'yicha qidirish..." aria-label="Stipendiyalar boʻyicha qidirish"> <!-- Tarjima qilindi -->
+                                </div>
+                                <div class="table-actions">
+                                     <select id="manage-sch-status-filter" class="btn btn-secondary btn-sm" style="height: 38px;" aria-label="Holat boʻyicha filtr"> <!-- Tarjima qilindi -->
+                                         <option value="">Barcha holatlar</option> <!-- Tarjima qilindi -->
+                                         <option value="Активна">Faollar</option> <!-- Tarjima qilindi -->
+                                         <option value="Завершена">Tugallanganlar</option> <!-- Tarjima qilindi -->
+                                         <option value="Черновик">Qoralamalar</option> <!-- Tarjima qilindi -->
+                                     </select>
+                                    <button class="btn btn-primary btn-sm" id="add-scholarship-btn"><i class="fa-solid fa-plus"></i> Stipendiya Qoʻshish</button> <!-- Tarjima qilindi -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="cool-table" id="scholarships-manage-table">
+                                <thead>
+                                    <tr>
+                                        <!-- Saralash ikonkalari qoldirildi -->
+                                        <th data-sort="name">Stipendiya Nomi <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
+                                        <th data-sort="provider">Ta'minotchi <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
+                                        <th data-sort="deadline">Muddat <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
+                                        <th data-sort="type">Turi <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
+                                        <th>Arizalar Soni</th> <!-- Tarjima qilindi -->
+                                        <th data-sort="status">Holati <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
+                                        <th>Amallar</th> <!-- Tarjima qilindi -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Yuklanish indikatori (JS tomonidan boshqariladi) -->
+                                    <tr class="table-placeholder">
+                                        <td colspan="7" style="text-align: center; padding: 50px 0; color: var(--text-light);">
+                                            <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                                            <p>Stipendiyalar yuklanmoqda...</p> <!-- Tarjima qilindi -->
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination-wrapper" id="manage-sch-pagination">
+                            <!-- Sahifalash JS orqali render qilinadi -->
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <footer class="main-footer">
+                <!-- Tarjima qilingan footer -->
+                🚀 "Shaffof Imkoniyat" Boshqaruv Paneli v1.1 | Halol kelajak uchun <i class="fa-solid fa-heart"></i> bilan yaratilgan | <a href="#">Loyihani qo'llab-quvvatlash</a>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Qo'shish/Tahrirlash uchun Modal Oyna -->
+    <div id="scholarship-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" id="modal-close-btn">×</span>
+            <div class="modal-header">
+                <h2 id="modal-title">Yangi stipendiya qo'shish</h2> <!-- Tarjima qilindi (dinamik o'zgaradi) -->
+            </div>
+            <div class="modal-body">
+                 <form id="scholarship-form">
+                     <input type="hidden" id="scholarship-edit-id" name="scholarship_id">
+                     <div class="form-grid">
+                         <div class="form-group" style="grid-column: 1 / -1;">
+                             <label for="modal-sch-name">Stipendiya nomi *</label> <!-- Tarjima qilindi -->
+                             <input type="text" id="modal-sch-name" name="name" required placeholder="Stipendiya nomini kiriting"> <!-- Tarjima qilindi -->
+                         </div>
+                         <div class="form-group">
+                             <label for="modal-sch-provider">Ta'minotchi *</label> <!-- Tarjima qilindi -->
+                             <input type="text" id="modal-sch-provider" name="provider" required placeholder="Tashkilot yoki fond nomi"> <!-- Tarjima qilindi -->
+                         </div>
+                         <div class="form-group">
+                             <label for="modal-sch-deadline">Topshirish muddati *</label> <!-- Tarjima qilindi -->
+                             <input type="date" id="modal-sch-deadline" name="deadline" required>
+                         </div>
+                         <div class="form-group">
+                             <label for="modal-sch-amount">Miqdori/Qoplash *</label> <!-- Tarjima qilindi -->
+                             <input type="text" id="modal-sch-amount" name="amount" required placeholder="To'liq qoplash / 1 000 000 so'm/oy"> <!-- Tarjima qilindi -->
+                         </div>
+                         <div class="form-group">
+                             <label for="modal-sch-field">Soha/Mutaxassisliklar *</label> <!-- Tarjima qilindi -->
+                             <input type="text" id="modal-sch-field" name="field" required placeholder="Axborot texnologiyalari, Matematika"> <!-- Tarjima qilindi -->
+                         </div>
+                         <div class="form-group">
+                             <label for="modal-sch-type">Stipendiya turi *</label> <!-- Tarjima qilindi -->
+                             <select id="modal-sch-type" name="type" required>
+                                 <option value="" disabled selected>Turni tanlang</option> <!-- Tarjima qilindi -->
+                                 <option value="Международная">Xalqaro</option> <!-- Tarjima qilindi -->
+                                 <option value="Государственная">Davlat</option> <!-- Tarjima qilindi -->
+                                 <option value="Частная">Xususiy</option> <!-- Tarjima qilindi -->
+                                 <option value="Региональная">Mintaqaviy</option> <!-- Tarjima qilindi -->
+                                 <option value="Корпоративная">Korporativ</option> <!-- Tarjima qilindi -->
+                             </select>
+                         </div>
+                         <div class="form-group">
+                             <label for="modal-sch-status">Holati *</label> <!-- Tarjima qilindi -->
+                             <select id="modal-sch-status" name="status" required>
+                                 <!-- Qiymatlar data.js bilan moslik uchun rus tilida qoladi -->
+                                 <option value="Активна">Faol</option> <!-- Tarjima qilindi -->
+                                 <option value="Завершена">Tugallangan</option> <!-- Tarjima qilindi -->
+                                 <option value="Черновик">Qoralama</option> <!-- Tarjima qilindi -->
+                             </select>
+                         </div>
+                         <div class="form-group" style="grid-column: 1 / -1;">
+                             <label for="modal-sch-description">Tavsif va Talablar</label> <!-- Tarjima qilindi -->
+                             <textarea id="modal-sch-description" name="description" rows="6" placeholder="Stipendiyaning batafsil tavsifi, tanlov mezonlari..."></textarea> <!-- Tarjima qilindi -->
+                         </div>
+                         <div class="form-group" style="display: flex; align-items: center; gap: 10px; grid-column: 1 / -1;">
+                             <input type="checkbox" id="modal-sch-popular" name="popular" style="width: auto; height: auto;">
+                             <label for="modal-sch-popular" style="font-weight: 500; margin-bottom: 0;">"Ommabop" deb belgilash?</label> <!-- Tarjima qilindi -->
+                         </div>
+                     </div>
+                 </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="modal-cancel-btn">Bekor qilish</button> <!-- Tarjima qilindi -->
+                <button type="submit" class="btn btn-primary" form="scholarship-form" id="modal-save-btn">Saqlash</button> <!-- Tarjima qilindi -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bildirishnomalar uchun konteyner -->
+    <div class="notifications-container" id="notifications-container"></div>
+
+    <!-- Skriptlar -->
+    <script src="{% static 'js/data.js' %}"></script>
+    <script src="{% static 'js/script.js' %}"></script>
+    <script src="{% static 'js/chart-config.js' %}"></script>
+    <!-- Ushbu sahifa uchun maxsus JS -->
+     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Keraksiz console.log olib tashlandi
+            const tableBody = document.querySelector('#scholarships-manage-table tbody');
+            const placeholderRow = tableBody.querySelector('.table-placeholder');
+            const paginationWrapper = document.getElementById('manage-sch-pagination');
+            const searchInput = document.getElementById('manage-sch-search-input');
+            const statusFilter = document.getElementById('manage-sch-status-filter');
+            const addBtn = document.getElementById('add-scholarship-btn');
+            const modal = document.getElementById('scholarship-modal');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+            const modalCancelBtn = document.getElementById('modal-cancel-btn');
+            const modalForm = document.getElementById('scholarship-form');
+            const modalTitle = document.getElementById('modal-title');
+            const modalSaveBtn = document.getElementById('modal-save-btn');
+            const editIdInput = document.getElementById('scholarship-edit-id');
+
+            let currentPage = 1;
+            const rowsPerPage = 10;
+            let allScholarshipsData = [];
+            let currentTableData = [];
+            let currentSort = { column: 'deadline', direction: 'asc' }; // Standart saralash
+
+            // Holatlar uchun tarjima va klasslar/ikonkalar
+            const statusTranslations = {
+                'Активна': 'Faol',
+                'Завершена': 'Tugallangan',
+                'Черновик': 'Qoralama'
+            };
+            const statusClasses = {
+                'Активна': 'status-approved', // Faol uchun yashil
+                'Завершена': 'status-archived', // Tugallangan uchun kulrang/arxiv
+                'Черновик': 'status-pending' // Qoralama uchun sariq/kutish
+            };
+            const statusIcons = {
+                'Активна': 'fa-check-circle',
+                'Завершена': 'fa-archive',
+                'Черновик': 'fa-edit' // Qoralama uchun tahrir belgisi
+            };
+
+             function renderManageSchTable(data) {
+                 tableBody.innerHTML = ''; // Jadvalni tozalash
+                 if (data.length === 0) {
+                     // Stipendiyalar topilmaganda xabar (tarjima qilingan)
+                     tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px 0; color: var(--text-light);">Stipendiyalar topilmadi.</td></tr>`;
+                     return;
+                 }
+                 const startIndex = (currentPage - 1) * rowsPerPage;
+                 const endIndex = startIndex + rowsPerPage;
+                 const paginatedData = data.slice(startIndex, endIndex);
+
+                 paginatedData.forEach((item, index) => {
+                     // Arizalar sonini hisoblash (demoApplications data.js da mavjud deb faraz qilinadi)
+                     const applicationsCount = typeof demoApplications !== 'undefined' ? demoApplications.filter(app => app.scholarshipId === item.id).length : 0;
+
+                     const row = document.createElement('tr');
+                     row.style.opacity = '0'; // Animatsiya uchun
+
+                     const translatedStatus = statusTranslations[item.status] || item.status; // Holatni tarjima qilish
+                     const statusBadgeClass = statusClasses[item.status] || 'status-pending';
+                     const statusIconClass = statusIcons[item.status] || 'fa-question-circle';
+
+                     // Holatni o'zgartirish tugmasi uchun ikonka va title
+                     const toggleStatusIcon = item.status === 'Активна' ? 'fa-archive' : 'fa-check'; // Faol bo'lsa arxivlash, aks holda faollashtirish
+                     const toggleStatusTitle = item.status === 'Активна' ? 'Tugatish/Arxivlash' : 'Faollashtirish'; // Tarjima qilindi
+
+                     row.innerHTML = `
+                        <td>${item.name} ${item.popular ? '<i class="fa-solid fa-fire" style="color: var(--accent-orange);" title="Ommabop"></i>' : ''}</td> <!-- Tarjima qilindi -->
+                        <td>${item.provider}</td>
+                        <td>${item.deadline || '-'}</td> <!-- Agar muddat bo'lmasa chiziqcha -->
+                        <td>${item.type}</td> <!-- Turni tarjima qilish mumkin, lekin data.js bilan moslik uchun qoldirildi -->
+                        <td>${applicationsCount}</td>
+                        <td>
+                            <span class="status-badge ${statusBadgeClass}">
+                                <i class="fa-solid ${statusIconClass}"></i> ${translatedStatus}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="view-btn" title="Arizalarni ko'rish" data-schid="${item.id}"><i class="fa-solid fa-users"></i></button> <!-- Tarjima qilindi -->
+                                <button class="edit-btn" title="Tahrirlash" data-schid="${item.id}"><i class="fa-solid fa-pen"></i></button> <!-- Tarjima qilindi -->
+                                <button class="delete-btn" title="${toggleStatusTitle}" data-schid="${item.id}"><i class="fa-solid ${toggleStatusIcon}"></i></button>
+                            </div>
+                        </td>`;
+                    tableBody.appendChild(row);
+                    // Animatsiya
+                    setTimeout(() => {
+                        row.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                        row.style.opacity = '1';
+                        row.style.transform = 'translateY(0)';
+                    }, 50 * index);
+                 });
+                 addManageSchActionListeners(); // Harakat tugmalari uchun event listener'larni qo'shish
+            }
+
+             function renderManageSchPagination(totalRows) {
+                 if (!paginationWrapper) return;
+                 paginationWrapper.innerHTML = ''; // Eski sahifalashni tozalash
+                 const totalPages = Math.ceil(totalRows / rowsPerPage);
+                 if (totalPages <= 1) return; // Agar bitta sahifa bo'lsa, ko'rsatmaslik
+
+                 const startRow = (currentPage - 1) * rowsPerPage + 1;
+                 const endRow = Math.min(currentPage * rowsPerPage, totalRows);
+
+                 // Ma'lumot (tarjima qilingan)
+                 const infoSpan = document.createElement('span');
+                 infoSpan.classList.add('pagination-info');
+                 infoSpan.textContent = `${totalRows} ta stipendiyadan ${startRow}-${endRow} koʻrsatilmoqda`;
+                 paginationWrapper.appendChild(infoSpan);
+
+                 const controlsDiv = document.createElement('div');
+                 controlsDiv.classList.add('pagination-controls');
+
+                 // Orqaga tugmasi (tarjima qilingan)
+                 const prevButton = document.createElement('button');
+                 prevButton.classList.add('btn', 'btn-secondary', 'btn-sm');
+                 prevButton.innerHTML = '« Orqaga';
+                 prevButton.disabled = currentPage === 1;
+                 prevButton.addEventListener('click', () => {
+                     if (currentPage > 1) {
+                         currentPage--;
+                         renderManageSchTable(currentTableData);
+                         renderManageSchPagination(totalRows);
+                     }
+                 });
+                 controlsDiv.appendChild(prevButton);
+
+                 // Oldinga tugmasi (tarjima qilingan)
+                 const nextButton = document.createElement('button');
+                 nextButton.classList.add('btn', 'btn-secondary', 'btn-sm');
+                 nextButton.innerHTML = 'Oldinga »';
+                 nextButton.disabled = currentPage === totalPages;
+                 nextButton.addEventListener('click', () => {
+                     if (currentPage < totalPages) {
+                         currentPage++;
+                         renderManageSchTable(currentTableData);
+                         renderManageSchPagination(totalRows);
+                     }
+                 });
+                 controlsDiv.appendChild(nextButton);
+
+                 paginationWrapper.appendChild(controlsDiv);
+             }
+
+            function sortManageSchData(data, column, direction) {
+                 // Saralash logikasi (JavaScript sort)
+                 return [...data].sort((a, b) => {
+                     let valA, valB;
+                     switch(column) {
+                         case 'name':
+                             valA = a.name.toLowerCase();
+                             valB = b.name.toLowerCase();
+                             break;
+                         case 'provider':
+                             valA = a.provider.toLowerCase();
+                             valB = b.provider.toLowerCase();
+                             break;
+                         case 'deadline':
+                             // Sana formatini to'g'ri parse qilish muhim (YYYY-MM-DD deb faraz qilinadi)
+                             try {
+                                valA = new Date(a.deadline);
+                                valB = new Date(b.deadline);
+                                if(isNaN(valA)) valA = new Date(0); // Agar sana noto'g'ri bo'lsa
+                                if(isNaN(valB)) valB = new Date(0);
+                             } catch (e) { valA = 0; valB = 0; }
+                             break;
+                         case 'type':
+                             valA = a.type.toLowerCase();
+                             valB = b.type.toLowerCase();
+                             break;
+                         case 'status':
+                             valA = a.status.toLowerCase();
+                             valB = b.status.toLowerCase();
+                             break;
+                         default: // Agar noaniq ustun bo'lsa, muddat bo'yicha saralash
+                             try {
+                                valA = new Date(a.deadline);
+                                valB = new Date(b.deadline);
+                                if(isNaN(valA)) valA = new Date(0);
+                                if(isNaN(valB)) valB = new Date(0);
+                             } catch (e) { valA = 0; valB = 0; }
+                     }
+                     // Qiymatlarni taqqoslash
+                     if (valA < valB) return direction === 'asc' ? -1 : 1;
+                     if (valA > valB) return direction === 'asc' ? 1 : -1;
+                     return 0;
+                 });
+             }
+
+            function filterAndDisplayManageSch() {
+                 const searchTerm = searchInput.value.toLowerCase().trim();
+                 const selectedStatus = statusFilter.value; // Holat qiymati rus tilida qoladi (data.js bilan moslik uchun)
+                 currentPage = 1; // Filtr o'zgarganda birinchi sahifaga qaytish
+
+                 const filtered = allScholarshipsData.filter(item => {
+                     // Qidiruv shartlari
+                     const nameMatch = item.name.toLowerCase().includes(searchTerm);
+                     const providerMatch = item.provider.toLowerCase().includes(searchTerm);
+                     // Filtr shartlari
+                     const statusMatchFilter = !selectedStatus || item.status === selectedStatus;
+                     // Natijani qaytarish
+                     return (nameMatch || providerMatch) && statusMatchFilter;
+                 });
+
+                 currentTableData = sortManageSchData(filtered, currentSort.column, currentSort.direction);
+                 renderManageSchTable(currentTableData);
+                 renderManageSchPagination(currentTableData.length);
+             }
+
+            // Modal oynani ochish (qo'shish yoki tahrirlash uchun)
+            function openModal(scholarship = null) {
+                 modalForm.reset(); // Formani tozalash
+                 editIdInput.value = ''; // ID ni tozalash
+                 modalForm.querySelectorAll('input, select, textarea').forEach(el => el.style.borderColor = ''); // Validatsiya chegaralarini tozalash
+
+                 if (scholarship) { // Tahrirlash rejimi
+                     modalTitle.textContent = 'Stipendiyani tahrirlash'; // Tarjima qilindi
+                     editIdInput.value = scholarship.id;
+                     // Form maydonlarini to'ldirish
+                     document.getElementById('modal-sch-name').value = scholarship.name || '';
+                     document.getElementById('modal-sch-provider').value = scholarship.provider || '';
+                     // Sana inputi uchun YYYY-MM-DD formatida qiymat kerak
+                     document.getElementById('modal-sch-deadline').value = scholarship.deadline || '';
+                     document.getElementById('modal-sch-amount').value = scholarship.amount || '';
+                     document.getElementById('modal-sch-field').value = scholarship.field || '';
+                     document.getElementById('modal-sch-type').value = scholarship.type || '';
+                     document.getElementById('modal-sch-status').value = scholarship.status || 'Черновик'; // Standart holat
+                     document.getElementById('modal-sch-description').value = scholarship.description || '';
+                     document.getElementById('modal-sch-popular').checked = scholarship.popular || false;
+                 } else { // Qo'shish rejimi
+                     modalTitle.textContent = 'Yangi stipendiya qo\'shish'; // Tarjima qilindi
+                 }
+                 modal.classList.add('active'); // Modalni ko'rsatish
+                 // Modal paydo bo'lgach, birinchi inputga fokus berish
+                 setTimeout(() => {
+                    document.getElementById('modal-sch-name')?.focus();
+                 }, 100);
+             }
+
+             // Modal oynani yopish
+             function closeModal() {
+                 modal.classList.remove('active');
+             }
+
+             // Modal oynani ochish/yopish uchun event listener'lar
+             addBtn.addEventListener('click', () => openModal());
+             modalCloseBtn.addEventListener('click', closeModal);
+             modalCancelBtn.addEventListener('click', closeModal);
+             modal.addEventListener('click', (e) => { // Tashqariga bosganda yopish
+                 if (e.target === modal) {
+                     closeModal();
+                 }
+             });
+
+             // Modal forma jo'natilganda
+             modalForm.addEventListener('submit', (e) => {
+                  e.preventDefault(); // Standart jo'natishni to'xtatish
+                  const formData = new FormData(modalForm);
+                  const scholarshipData = Object.fromEntries(formData.entries());
+                  scholarshipData.popular = scholarshipData.popular === 'on'; // Checkbox qiymatini boolean ga o'tkazish
+                  const idToEdit = parseInt(scholarshipData.scholarship_id);
+
+                  // Oddiy validatsiya (bo'sh maydonlar uchun - required atributi bajaradi)
+                  // Sana validatsiyasi: Muddat yangi/faol stipendiya uchun o'tmishda bo'lishi mumkin emas
+                  const deadline = new Date(scholarshipData.deadline);
+                  const today = new Date(); today.setHours(0,0,0,0); // Vaqtni olib tashlash
+
+                  if (scholarshipData.deadline && (!idToEdit || scholarshipData.status === 'Активна') && deadline < today) {
+                      if (typeof showToast === 'function') {
+                          showToast('Faol yoki yangi stipendiya uchun muddat oʻtmishda boʻlishi mumkin emas.', 'Sana xatosi', 'error'); // Tarjima qilindi
+                      }
+                      document.getElementById('modal-sch-deadline').style.borderColor = 'var(--accent-red)';
+                      document.getElementById('modal-sch-deadline').focus();
+                      return; // Jarayonni to'xtatish
+                  } else {
+                       document.getElementById('modal-sch-deadline').style.borderColor = ''; // Xatolik yo'q bo'lsa, chegara rangini tiklash
+                  }
+
+                  // demoScholarships data.js da mavjud deb faraz qilinadi
+                  if (typeof demoScholarships === 'undefined') {
+                     if(typeof showToast === 'function') showToast('Maʼlumotlar bazasi topilmadi (demo).', 'Xatolik', 'error');
+                     return;
+                  }
+
+                  if (idToEdit) { // Tahrirlash
+                      const index = demoScholarships.findIndex(s => s.id === idToEdit);
+                      if (index !== -1) {
+                          // Eskisini saqlab qolgan holda yangi ma'lumotlarni birlashtirish
+                          demoScholarships[index] = { ...demoScholarships[index], ...scholarshipData, id: idToEdit };
+                          if(typeof showToast === 'function') showToast(`#${idToEdit} raqamli stipendiya yangilandi.`, 'Muvaffaqiyatli', 'success'); // Tarjima qilindi
+                      } else {
+                          if(typeof showToast === 'function') showToast(`#${idToEdit} raqamli stipendiya topilmadi.`, 'Xatolik', 'error'); // Tarjima qilindi
+                          return;
+                      }
+                  } else { // Qo'shish
+                      // Yangi ID yaratish
+                      const newId = demoScholarships.length > 0 ? Math.max(...demoScholarships.map(s => s.id)) + 1 : 1;
+                      scholarshipData.id = newId;
+                      delete scholarshipData.scholarship_id; // Keraksiz maydonni o'chirish
+                      demoScholarships.push(scholarshipData);
+                      if(typeof showToast === 'function') showToast(`"${scholarshipData.name}" stipendiyasi qo'shildi.`, 'Muvaffaqiyatli', 'success'); // Tarjima qilindi
+                  }
+
+                  allScholarshipsData = [...demoScholarships]; // Asosiy ma'lumotlar massivini yangilash
+                  filterAndDisplayManageSch(); // Jadvalni yangilash
+                  closeModal(); // Modalni yopish
+             });
+
+             // Jadvaldagi harakat tugmalari uchun event listener'lar
+             function addManageSchActionListeners() {
+                  // Tahrirlash tugmasi
+                  tableBody.querySelectorAll('.edit-btn').forEach(btn => {
+                      btn.addEventListener('click', (e) => {
+                          const schId = parseInt(e.currentTarget.dataset.schid);
+                          const scholarship = typeof findScholarship === 'function' ? findScholarship(schId) : allScholarshipsData.find(s => s.id === schId);
+                          if (scholarship) {
+                              openModal(scholarship);
+                          } else {
+                              if(typeof showToast === 'function') showToast('Tahrirlash uchun stipendiya topilmadi.', 'Xatolik', 'error'); // Tarjima qilindi
+                          }
+                      });
+                  });
+
+                  // Arizalarni ko'rish tugmasi
+                  tableBody.querySelectorAll('.view-btn').forEach(btn => {
+                      btn.addEventListener('click', (e) => {
+                          const schId = parseInt(e.currentTarget.dataset.schid);
+                          // Barcha arizalar sahifasiga shu stipendiya filtri bilan o'tish
+                          window.location.href = `all_applications.html?scholarship_filter=${schId}`;
+                      });
+                  });
+
+                  // Holatni o'zgartirish (arxivlash/faollashtirish) tugmasi
+                  tableBody.querySelectorAll('.delete-btn').forEach(btn => {
+                      btn.addEventListener('click', (e) => {
+                          const schId = parseInt(e.currentTarget.dataset.schid);
+                          const scholarship = typeof findScholarship === 'function' ? findScholarship(schId) : allScholarshipsData.find(s => s.id === schId);
+                          if (scholarship && typeof demoScholarships !== 'undefined') {
+                              const currentStatus = scholarship.status;
+                              const nextStatus = currentStatus === 'Активна' ? 'Завершена' : 'Активна'; // Holat rus tilida qoladi
+                              const actionText = currentStatus === 'Активна' ? 'tugatishni/arxivlashni' : 'faollashtirishni'; // Tarjima qilindi
+                              const translatedNextStatus = statusTranslations[nextStatus] || nextStatus; // Tarjima qilingan holat nomi
+
+                              if (confirm(`Haqiqatan ham "${scholarship.name}" stipendiyasini ${actionText} xohlaysizmi?`)) { // Tarjima qilindi
+                                  const index = demoScholarships.findIndex(s => s.id === schId);
+                                  if (index !== -1) {
+                                      demoScholarships[index].status = nextStatus; // Holatni o'zgartirish
+                                      if(typeof showToast === 'function') showToast(`Stipendiya holati "${translatedNextStatus}" ga o'zgartirildi (demo).`, 'Muvaffaqiyatli', 'success'); // Tarjima qilindi
+                                      allScholarshipsData = [...demoScholarships]; // Asosiy ma'lumotlarni yangilash
+                                      filterAndDisplayManageSch(); // Jadvalni yangilash
+                                  }
+                              }
+                          } else if (typeof demoScholarships === 'undefined') {
+                             if(typeof showToast === 'function') showToast('Maʼlumotlar bazasi topilmadi (demo).', 'Xatolik', 'error');
+                          } else {
+                             if(typeof showToast === 'function') showToast('Stipendiya topilmadi.', 'Xatolik', 'error'); // Tarjima qilindi
+                          }
+                      });
+                  });
+            }
+
+             // Sahifani initsializatsiya qilish
+             function initManageSchPage() {
+                if(placeholderRow) placeholderRow.style.display = 'none'; // Yuklanish indikatorini yashirish
+                // Stipendiyalarni yuklash (demoScholarships data.js da mavjud deb faraz qilinadi)
+                allScholarshipsData = typeof demoScholarships !== 'undefined' ? [...demoScholarships] : [];
+                filterAndDisplayManageSch(); // Ma'lumotlarni filtrlab ko'rsatish
+                updateManageSchSortHeaders(); // Saralash sarlavhalarini yangilash
+             }
+
+             // Saralash sarlavhalarini yangilash
+             function updateManageSchSortHeaders() {
+                 manageSchTableHeaders.forEach(h => {
+                     h.classList.remove('sort-asc', 'sort-desc'); // Oldingi saralash klasslarini olib tashlash
+                     if (h.getAttribute('data-sort') === currentSort.column) {
+                         h.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc'); // Joriy saralash klassini qo'shish
+                     }
+                 });
+             }
+
+             // Jadval sarlavhalariga saralash uchun event listener'larni qo'shish
+             const manageSchTableHeaders = document.querySelectorAll('#scholarships-manage-table th[data-sort]');
+             manageSchTableHeaders.forEach(header => {
+                 header.addEventListener('click', () => {
+                     const sortColumn = header.getAttribute('data-sort');
+                     let sortDirection = 'asc'; // Standart yo'nalish
+
+                     if (currentSort.column === sortColumn) {
+                         // Agar shu ustun bo'yicha saralangan bo'lsa, yo'nalishni o'zgartirish
+                         sortDirection = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                     } else {
+                         // Yangi ustun bo'yicha saralash (asc bo'yicha)
+                         sortDirection = 'asc';
+                     }
+
+                     currentSort = { column: sortColumn, direction: sortDirection }; // Joriy saralashni yangilash
+                     filterAndDisplayManageSch(); // Ma'lumotlarni qayta saralab ko'rsatish
+                     updateManageSchSortHeaders(); // Sarlavha ikonkalarni yangilash
+                 });
+             });
+
+             // Filtrlar uchun event listener'lar
+             searchInput.addEventListener('input', filterAndDisplayManageSch);
+             statusFilter.addEventListener('change', filterAndDisplayManageSch);
+
+             // Ma'lumotlarni kichik kechikish bilan yuklash (UI bloklanmasligi uchun)
+             setTimeout(initManageSchPage, 300);
+        });
+     </script>
+</body>
+</html>
+{% endblock %}

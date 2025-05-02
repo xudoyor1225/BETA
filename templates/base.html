@@ -1,0 +1,66 @@
+{% load static %}
+<html lang="uz"> <!-- Til o'zgartirildi -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Boshqaruv Paneli | Shaffof Imkoniyat</title> <!-- Tarjima qilindi -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- Grafiklar uchun kutubxona (Chart.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- GSAP animatsiya kutubxonasi (agar ishlatilmasa olib tashlash mumkin) -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script> -->
+<head>
+    <body class="dashboard-page">
+    <div class="dashboard-wrapper">
+        <!-- Yon panel -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-logo-text">Shaffof Imkoniyat</span> <!-- Tarjima qilindi -->
+            </div>
+<nav class="sidebar-menu">
+                <div class="menu-category">Asosiy</div> <!-- Tarjima qilindi -->
+                <ul class="menu-items">
+                    <!-- Aktiv class bu sahifaga mos kelishi kerak -->
+                    <li class="menu-item"><a href="{% url 'dashboard' %}" class="menu-link active"><i class="fa-solid fa-shapes"></i> <span>Boshqaruv Paneli</span></a></li> <!-- Tarjima qilindi, 'active' class qo'shildi -->
+                    <li class="menu-item"><a href="{% url 'my_applications' %}" class="menu-link"><i class="fa-solid fa-file-lines"></i> <span>Mening Arizalarim</span></a></li> <!-- Tarjima qilindi -->
+                    <li class="menu-item"><a href="{% url 'find_scholarships' %}" class="menu-link"><i class="fa-solid fa-magnifying-glass-chart"></i> <span>Stipendiyalarni Topish</span></a></li> <!-- Tarjima qilindi -->
+                    <li class="menu-item"><a href="{% url 'submit_application' %}" class="menu-link"><i class="fa-solid fa-paper-plane"></i> <span>Ariza Yuborish</span></a></li> <!-- Tarjima qilindi -->
+                </ul>
+                <!-- Agar joriy foydalanuvchi Admin bo'lmasa, bu bo'limni yashirish mumkin -->
+                <div class="menu-category">Ma'muriyat</div> <!-- Tarjima qilindi -->
+                 <ul class="menu-items">
+                    <li class="menu-item"><a href="{% url 'all_applications' %}" class="menu-link"><i class="fa-solid fa-table-list"></i> <span>Barcha Arizalar</span></a></li> <!-- Tarjima qilindi -->
+                    <li class="menu-item"><a href="{% url 'manage_scholarships' %}" class="menu-link"><i class="fa-solid fa-graduation-cap"></i> <span>Stipendiyalarni Boshqarish</span></a></li> <!-- Tarjima qilindi -->
+                    <li class="menu-item"><a href="{% url 'users' %}" class="menu-link"><i class="fa-solid fa-users-gear"></i> <span>Foydalanuvchilar</span></a></li> <!-- Tarjima qilindi -->
+                    <li class="menu-item"><a href="{% url 'analytics' %}" class="menu-link"><i class="fa-solid fa-chart-pie"></i> <span>Tahlil</span></a></li> <!-- Tarjima qilindi -->
+                </ul>
+                 <div class="menu-category">Hisob</div> <!-- Tarjima qilindi -->
+                 <ul class="menu-items">
+                     <li class="menu-item"><a href="{% url 'profile_settings' %}" class="menu-link"><i class="fa-solid fa-user-pen"></i> <span>Profil Sozlamalari</span></a></li> <!-- Tarjima qilindi -->
+                     <li class="menu-item"><a href="{% url 'security' %}" class="menu-link"><i class="fa-solid fa-shield-halved"></i> <span>Xavfsizlik</span></a></li> <!-- Tarjima qilindi -->
+                     <li class="menu-item"><a href="{% url 'help_center' %}" class="menu-link"><i class="fa-solid fa-circle-question"></i> <span>Yordam Markazi</span></a></li> <!-- Tarjima qilindi -->
+                     <li class="menu-item"><a href="#" class="menu-link logout-link" id="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Chiqish</span></a></li> <!-- Tarjima qilindi -->
+                 </ul>
+            </nav>
+            <div class="user-profile-sidebar">
+                 <!-- JS orqali dinamik yuklanadigan ID'lar -->
+                <a href="{% url 'profile_settings' %}">
+                 <img src="https://i.pravatar.cc/40?img=4" alt="User Avatar" id="sidebar-avatar">
+                     </a>
+                 <div class="user-info">
+                     <span class="user-name" id="sidebar-user-name">ubtuit</span>
+                     <span class="user-role" id="sidebar-user-role">Super Admin</span> <!-- Tarjima qilindi -->
+                 </div>
+
+            </div>
+        </aside>
+
+        <!-- Asosiy kontent uchun o'ram -->
+        {% block content %}{% endblock %}
+</body>
+</head>
+</html>
