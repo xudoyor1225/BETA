@@ -1,375 +1,107 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block content %}
+<div class="main-content-wrapper">
+    <!-- Header -->
+     <header class="main-header">
+        <div class="header-left">
+           <button class="menu-toggle-btn" id="menu-toggle" title="Menyuni yig'ish/kengaytirish" aria-label="Menyu">
+               <i class="fa-solid fa-bars"></i>
+           </button>
+       </div>
+       <div class="header-right">
+            <div class="profile-dropdown" title="Profil sozlamalari">
+            </div>
+       </div>
+   </header>
 
-        <!-- Asosiy kontent uchun o'ram -->
-        <div class="main-content-wrapper">
-            <!-- Header (minimal) -->
-             <header class="main-header">
-                 <div class="header-left">
-                     <button class="menu-toggle-btn" id="menu-toggle" title="Menyuni yig'ish/kengaytirish" aria-label="Menyu"> <!-- Tarjima qilindi -->
-                         <i class="fa-solid fa-bars"></i>
-                     </button>
-                 </div>
-                 <div class="header-right">
-                     <!-- Profil rasmi va dropdown -->
-                     <div class="profile-dropdown" title="Profil sozlamalari"> <!-- Tarjima qilindi -->
-                         <img src="https://i.pravatar.cc/40?img=4" alt="Avatar" class="profile-avatar" id="header-avatar">
-                     </div>
-                 </div>
-             </header>
-
-            <!-- Sahifa kontenti -->
-            <main class="page-content">
-                <h1 class="page-title">Xavfsizlik Sozlamalari</h1> <!-- Tarjima qilindi -->
-                 <div class="animate-on-load">
-                     <div class="settings-container"> <!-- Profile settings sahifasidagi kabi layout -->
-                         <section class="settings-content" style="flex: 1;"> <!-- Chap menyu yo'q, kontent kengaytirilgan -->
-                             <!-- Parolni o'zgartirish bo'limi -->
-                             <div class="settings-section" id="change-password">
-                                 <h2><i class="fa-solid fa-key"></i> Parolni Oʻzgartirish</h2> <!-- Tarjima qilindi -->
-                                 <form id="password-change-form">
-                                      <div class="form-grid">
-                                         <div class="form-group">
-                                             <label for="current-password">Joriy parol *</label> <!-- Tarjima qilindi -->
-                                             <input type="password" id="current-password" name="current_password" required autocomplete="current-password">
-                                         </div>
-                                          <div class="form-group">
-                                              <label for="new-password">Yangi parol *</label> <!-- Tarjima qilindi -->
-                                              <input type="password" id="new-password" name="new_password" required minlength="8" autocomplete="new-password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Kamida 8 belgi, raqam, kichik va katta harflarni o'z ichiga olishi kerak."> <!-- Title tarjima qilindi -->
-                                              <small class="input-hint">Min. 8 belgi, raqamlar, turli registr harflari.</small> <!-- Tarjima qilindi -->
-                                          </div>
-                                          <div class="form-group">
-                                              <label for="confirm-password">Yangi parolni tasdiqlang *</label> <!-- Tarjima qilindi -->
-                                              <input type="password" id="confirm-password" name="confirm_password" required autocomplete="new-password">
-                                          </div>
-                                     </div>
-                                     <div style="text-align: right; margin-top: 20px;">
-                                         <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Parolni oʻzgartirish</button> <!-- Tarjima qilindi -->
-                                     </div>
-                                 </form>
+    <!-- Sahifa kontenti -->
+    <main class="page-content">
+        <h1 class="page-title">Xavfsizlik Sozlamalari</h1>
+         <div class="animate-on-load">
+             <div class="settings-container">
+                 <section class="settings-content" style="flex: 1;">
+                     <!-- Parolni o'zgartirish bo'limi -->
+                     <div class="settings-section" id="change-password">
+                         <h2><i class="fa-solid fa-key"></i> Parolni Oʻzgartirish</h2>
+                         {# Agar xatoliklar bo'lsa ko'rsatish #}
+                         {% if password_form.non_field_errors %}
+                            <div class="form-errors alert alert-danger">
+                                {{ password_form.non_field_errors }}
+                            </div>
+                         {% endif %}
+                         <form method="post" id="password-change-form">
+                              {% csrf_token %}
+                              <div class="form-grid">
+                                 {# Parol formasini maydonma-maydon render qilish #}
+                                 {% include 'includes/form_field.html' with field=password_form.old_password %}
+                                 {% include 'includes/form_field.html' with field=password_form.new_password1 %}
+                                 {% include 'includes/form_field.html' with field=password_form.new_password2 %}
                              </div>
-                             <!-- Ikki faktorli autentifikatsiya (2FA) bo'limi -->
-                             <div class="settings-section" id="two-factor">
-                                 <h2><i class="fa-solid fa-mobile-screen-button"></i> Ikki Faktorli Autentifikatsiya (2FA)</h2> <!-- Tarjima qilindi -->
-                                 <div id="2fa-status" style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border-radius: var(--border-radius-md); border: 1px solid var(--border-color);">
-                                     <i id="2fa-icon" class="fa-solid fa-shield-slash fa-2x" style="color: var(--accent-red);"></i>
-                                     <div>
-                                         <strong id="2fa-status-text">2FA oʻchirilgan</strong> <!-- Tarjima qilindi (dinamik o'zgaradi) -->
-                                         <p id="2fa-description" style="font-size: 0.9rem; color: var(--text-medium);">Qoʻshimcha himoya uchun 2FA ni yoqing.</p> <!-- Tarjima qilindi (dinamik o'zgaradi) -->
-                                     </div>
-                                     <button class="btn btn-success btn-sm" id="enable-2fa-btn" style="margin-left: auto;">2FA ni Yoqish</button> <!-- Tarjima qilindi -->
-                                     <button class="btn btn-danger btn-sm" id="disable-2fa-btn" style="margin-left: auto; display: none;">2FA ni Oʻchirish</button> <!-- Tarjima qilindi -->
-                                 </div>
-                                 <!-- 2FA sozlash bloki (yashirilgan) -->
-                                 <div id="2fa-setup" style="display: none; margin-top: 20px;">
-                                     <p>Autentifikatsiya ilovasi yordamida QR kodni skanerlang va kodni kiriting:</p> <!-- Tarjima qilindi -->
-                                     <div style="display: flex; gap: 20px; align-items: center; margin-top: 15px; flex-wrap: wrap;">
-                                         <img id="qr-code-image" src="https://via.placeholder.com/150?text=QR+Kod" alt="2FA uchun QR kod" style="border: 1px solid var(--border-color);"> <!-- Tarjima qilindi -->
-                                         <div class="form-group" style="flex-grow: 1; min-width: 200px;">
-                                             <label for="2fa-code">Tasdiqlash kodi *</label> <!-- Tarjima qilindi -->
-                                             <input type="text" id="2fa-code" name="2fa_code" pattern="\d{6}" required placeholder="123456" style="font-size: 1.2rem; text-align: center; letter-spacing: 5px;">
-                                             <button type="button" class="btn btn-primary" id="verify-2fa-btn" style="margin-top: 10px;">Tasdiqlash</button> <!-- Tarjima qilindi -->
-                                         </div>
-                                     </div>
+                             <div style="text-align: right; margin-top: 20px;">
+                                 <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Parolni oʻzgartirish</button>
+                             </div>
+                         </form>
+                     </div>
+
+                     <!-- Ikki faktorli autentifikatsiya (2FA) bo'limi -->
+                     {# 2FA uchun backend logikasi va kontekst kerak (is_2fa_enabled) #}
+                     <div class="settings-section" id="two-factor">
+                         <h2><i class="fa-solid fa-mobile-screen-button"></i> Ikki Faktorli Autentifikatsiya (2FA)</h2>
+                         <div id="2fa-status" style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border-radius: var(--border-radius-md); border: 1px solid var(--border-color);">
+                             {# Backenddan kelgan `is_2fa_enabled` ga qarab ko'rsatish #}
+                             {# {% if is_2fa_enabled %} ... {% else %} ... {% endif %} #}
+                             {# Hozircha JS boshqaradi deb hisoblaymiz #}
+                             <i id="2fa-icon" class="fa-solid fa-shield-slash fa-2x" style="color: var(--accent-red);"></i>
+                             <div>
+                                 <strong id="2fa-status-text">2FA oʻchirilgan</strong>
+                                 <p id="2fa-description" style="font-size: 0.9rem; color: var(--text-medium);">Qoʻshimcha himoya uchun 2FA ni yoqing.</p>
+                             </div>
+                             <button class="btn btn-success btn-sm" id="enable-2fa-btn" style="margin-left: auto;">2FA ni Yoqish</button>
+                             <button class="btn btn-danger btn-sm" id="disable-2fa-btn" style="margin-left: auto; display: none;">2FA ni Oʻchirish</button>
+                         </div>
+                         {# 2FA sozlash bloki (JS tomonidan boshqariladi) #}
+                         <div id="2fa-setup" style="display: none; margin-top: 20px;">
+                             <p>Autentifikatsiya ilovasi yordamida QR kodni skanerlang va kodni kiriting:</p>
+                             <div style="display: flex; gap: 20px; align-items: center; margin-top: 15px; flex-wrap: wrap;">
+                                 <img id="qr-code-image" src="{% static 'images/placeholder_qr.png' %}" alt="2FA uchun QR kod" style="border: 1px solid var(--border-color); width: 150px; height: 150px;">
+                                 <div class="form-group" style="flex-grow: 1; min-width: 200px;">
+                                     <label for="2fa-code">Tasdiqlash kodi *</label>
+                                     <input type="text" id="2fa-code" name="2fa_code" pattern="\d{6}" required placeholder="123456" style="font-size: 1.2rem; text-align: center; letter-spacing: 5px;">
+                                     <button type="button" class="btn btn-primary" id="verify-2fa-btn" style="margin-top: 10px;">Tasdiqlash</button>
                                  </div>
                              </div>
-                              <!-- Faol sessiyalar bo'limi -->
-                             <div class="settings-section" id="active-sessions">
-                                 <h2><i class="fa-solid fa-desktop"></i> Faol Sessiyalar</h2> <!-- Tarjima qilindi -->
-                                 <p style="color: var(--text-medium); margin-bottom: 20px;">Hisobingizga kirilgan qurilmalar.</p> <!-- Tarjima qilindi -->
-                                 <ul id="session-list" style="list-style: none; padding: 0;">
-                                     <!-- Yuklanish indikatori (JS tomonidan boshqariladi) -->
-                                     <li class="session-item-placeholder" style="padding: 15px 0; border-bottom: 1px solid var(--border-color); color: var(--text-light);">Sessiyalar yuklanmoqda...</li> <!-- Tarjima qilindi -->
-                                 </ul>
-                                  <div style="text-align: right; margin-top: 20px;">
-                                      <button type="button" class="btn btn-danger btn-sm" id="logout-all-btn"><i class="fa-solid fa-power-off"></i> Barcha boshqa sessiyalarni tugatish</button> <!-- Tarjima qilindi -->
-                                  </div>
-                             </div>
-                         </section>
+                         </div>
                      </div>
-                 </div>
-            </main>
 
-            <!-- Footer -->
-            <footer class="main-footer">
-                <!-- Tarjima qilingan footer -->
-                🚀 "Shaffof Imkoniyat" Boshqaruv Paneli v1.1 | Halol kelajak uchun <i class="fa-solid fa-heart"></i> bilan yaratilgan | <a href="#">Loyihani qo'llab-quvvatlash</a>
-            </footer>
-        </div>
-    </div>
+                      <!-- Faol sessiyalar bo'limi -->
+                     {# Sessiyalar backenddan kelishi kerak (active_sessions) #}
+                     <div class="settings-section" id="active-sessions">
+                         <h2><i class="fa-solid fa-desktop"></i> Faol Sessiyalar</h2>
+                         <p style="color: var(--text-medium); margin-bottom: 20px;">Hisobingizga kirilgan qurilmalar.</p>
+                         <ul id="session-list" style="list-style: none; padding: 0;">
+                             {# {% for session in active_sessions %} ... {% empty %} ... {% endfor %} #}
+                             {# Hozircha JS boshqaradi deb hisoblaymiz #}
+                             <li class="session-item-placeholder" style="padding: 15px 0; border-bottom: 1px solid var(--border-color); color: var(--text-light);">Sessiyalar yuklanmoqda...</li>
+                         </ul>
+                          <div style="text-align: right; margin-top: 20px;">
+                              {# Bu tugma uchun alohida URL va view kerak #}
+                              <button type="button" class="btn btn-danger btn-sm" id="logout-all-btn"><i class="fa-solid fa-power-off"></i> Barcha boshqa sessiyalarni tugatish</button>
+                          </div>
+                     </div>
+                 </section>
+             </div>
+         </div>
+    </main>
+    <!-- Footer -->
+</div>
+{% endblock content %}
 
-    <!-- Bildirishnomalar uchun konteyner -->
-    <div class="notifications-container" id="notifications-container"></div>
-
-    <!-- Skriptlar -->
-    <script src="{% static 'js/data.js' %}"></script>
-    <script src="{% static 'js/script.js' %}"></script>
-    <!-- Chart.js bu sahifada ishlatilmasa ham, chart-config bo'lishi mumkin -->
-    <script src="{% static 'js/chart-config.js' %}"></script>
-     <!-- Ushbu sahifa uchun maxsus JS -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Keraksiz console.log olib tashlandi
-
-            // Parolni o'zgartirish formasi
-            const passwordForm = document.getElementById('password-change-form');
-            const newPasswordInput = document.getElementById('new-password');
-            const confirmPasswordInput = document.getElementById('confirm-password');
-
-            if (passwordForm) {
-                passwordForm.addEventListener('submit', (e) => {
-                    e.preventDefault(); // Standart jo'natishni to'xtatish
-                    // Input maydonlarining mavjudligini tekshirish
-                    if (!newPasswordInput || !confirmPasswordInput) {
-                        console.error("Parol maydonlari topilmadi!");
-                        return;
-                    }
-
-                    // Parollar mosligini tekshirish
-                    if (newPasswordInput.value !== confirmPasswordInput.value) {
-                         if(typeof showToast === 'function') showToast('Yangi parol va tasdiqlash mos kelmadi!', 'Xatolik', 'error'); // Tarjima qilindi
-                        confirmPasswordInput.style.borderColor = 'var(--accent-red)';
-                        confirmPasswordInput.focus();
-                        return;
-                    }
-                     // Parol uzunligini tekshirish
-                     if (newPasswordInput.value.length < 8) {
-                         if(typeof showToast === 'function') showToast('Yangi parol kamida 8 belgidan iborat boʻlishi kerak.', 'Xatolik', 'error'); // Tarjima qilindi
-                        newPasswordInput.style.borderColor = 'var(--accent-red)';
-                        newPasswordInput.focus();
-                        return;
-                     }
-                     // Parol murakkabligini tekshirish (pattern orqali)
-                     const passwordPattern = newPasswordInput.getAttribute('pattern');
-                     if (passwordPattern && !new RegExp(passwordPattern).test(newPasswordInput.value)) {
-                         if(typeof showToast === 'function') showToast(newPasswordInput.title || 'Parol murakkablik talablariga mos kelmaydi.', 'Xatolik', 'error'); // Tarjima qilindi
-                         newPasswordInput.style.borderColor = 'var(--accent-red)';
-                         newPasswordInput.focus();
-                         return;
-                     }
-
-                     // Agar validatsiyadan o'tsa, chegaralarni tiklash va xabar chiqarish
-                     newPasswordInput.style.borderColor = '';
-                     confirmPasswordInput.style.borderColor = '';
-                     // Keraksiz console.log olib tashlandi
-                      if(typeof showToast === 'function') showToast('Parol muvaffaqiyatli oʻzgartirildi (demo).', 'Muvaffaqiyatli', 'success'); // Tarjima qilindi
-                     passwordForm.reset(); // Formani tozalash
-                 });
-            }
-
-            // Parol tasdiqlash maydoniga kiritilganda tekshirish
-            if (confirmPasswordInput) {
-                confirmPasswordInput.addEventListener('input', () => {
-                    if (newPasswordInput && newPasswordInput.value === confirmPasswordInput.value) {
-                        confirmPasswordInput.style.borderColor = ''; // Mos kelsa, chegarani olib tashlash
-                    }
-                });
-            }
-            // Yangi parol maydoniga kiritilganda xato chegarasini olib tashlash
-            if (newPasswordInput) {
-                newPasswordInput.addEventListener('input', () => { newPasswordInput.style.borderColor = ''; });
-            }
-
-
-            // --- 2FA ---
-            const statusDiv = document.getElementById('2fa-status');
-            const setupDiv = document.getElementById('2fa-setup');
-            const enableBtn = document.getElementById('enable-2fa-btn');
-            const disableBtn = document.getElementById('disable-2fa-btn');
-            const verifyBtn = document.getElementById('verify-2fa-btn');
-            const statusText = document.getElementById('2fa-status-text');
-            const statusDesc = document.getElementById('2fa-description');
-            const statusIcon = document.getElementById('2fa-icon');
-            let is2faEnabled = false; // Demo uchun boshlang'ich holat
-
-            // 2FA UI ni yangilash funksiyasi
-            function update2faUI() {
-                 if (!statusText || !statusDesc || !statusIcon || !enableBtn || !disableBtn || !setupDiv) return; // Elementlar mavjudligini tekshirish
-
-                 if (is2faEnabled) {
-                     statusText.textContent = '2FA yoqilgan'; // Tarjima qilindi
-                     statusDesc.textContent = 'Hisobingiz himoyalangan.'; // Tarjima qilindi
-                     statusIcon.className = 'fa-solid fa-shield-check fa-2x'; // Ikona
-                     statusIcon.style.color = 'var(--secondary-brand)'; // Rang
-                     enableBtn.style.display = 'none'; // Yoqish tugmasini yashirish
-                     disableBtn.style.display = 'inline-flex'; // O'chirish tugmasini ko'rsatish
-                     setupDiv.style.display = 'none'; // Sozlash blokini yashirish
-                 } else {
-                     statusText.textContent = '2FA oʻchirilgan'; // Tarjima qilindi
-                     statusDesc.textContent = 'Qoʻshimcha himoya uchun 2FA ni yoqing.'; // Tarjima qilindi
-                     statusIcon.className = 'fa-solid fa-shield-slash fa-2x'; // Ikona
-                     statusIcon.style.color = 'var(--accent-red)'; // Rang
-                     enableBtn.style.display = 'inline-flex'; // Yoqish tugmasini ko'rsatish
-                     disableBtn.style.display = 'none'; // O'chirish tugmasini yashirish
-                     setupDiv.style.display = 'none'; // Sozlash blokini yashirish
-                 }
-             }
-
-            // 2FA ni yoqish tugmasi
-            if (enableBtn) {
-                enableBtn.addEventListener('click', () => {
-                    // Keraksiz console.log olib tashlandi
-                    const qrCodeImage = document.getElementById('qr-code-image');
-                    // Haqiqiy QR kod generatsiya qilish kerak (backend yordamida)
-                    // Bu demo QR kod:
-                    if (qrCodeImage) qrCodeImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=otpauth://totp/ShaffofImkoniyat:aidos.e@example.com?secret=JBSWY3DPEHPK3PXP&issuer=ShaffofImkoniyat`; // Issuer nomi ham tarjima qilindi
-                    if (setupDiv) setupDiv.style.display = 'block'; // Sozlash blokini ko'rsatish
-                    enableBtn.style.display = 'none'; // Yoqish tugmasini yashirish
-                });
-            }
-
-            // 2FA ni o'chirish tugmasi
-            if (disableBtn) {
-                disableBtn.addEventListener('click', () => {
-                    if (confirm('Ikki faktorli autentifikatsiyani oʻchirib tashlamoqchimisiz?')) { // Tarjima qilindi
-                        // Keraksiz console.log olib tashlandi
-                        is2faEnabled = false; // Holatni o'zgartirish
-                        update2faUI(); // UI ni yangilash
-                         if(typeof showToast === 'function') showToast('Ikki faktorli autentifikatsiya oʻchirildi.', 'Xavfsizlik', 'warning'); // Tarjima qilindi
-                    }
-                });
-            }
-
-            // 2FA kodini tasdiqlash tugmasi
-            if (verifyBtn) {
-                verifyBtn.addEventListener('click', () => {
-                    const codeInput = document.getElementById('2fa-code');
-                    if (!codeInput) return;
-                    const code = codeInput.value;
-                    // 6 xonali raqamligini tekshirish
-                    if (code && /^\d{6}$/.test(code)) {
-                        // Keraksiz console.log olib tashlandi
-                        // TODO: Kodni backendda tekshirish kerak
-                        is2faEnabled = true; // Demo uchun yoqish
-                        update2faUI(); // UI ni yangilash
-                         if(typeof showToast === 'function') showToast('Ikki faktorli autentifikatsiya muvaffaqiyatli yoqildi!', 'Xavfsizlik', 'success'); // Tarjima qilindi
-                        codeInput.value = ''; // Maydonni tozalash
-                    } else {
-                         if(typeof showToast === 'function') showToast('Toʻgʻri 6 xonali kodni kiriting.', 'Xatolik', 'error'); // Tarjima qilindi
-                        codeInput.style.borderColor = 'var(--accent-red)';
-                        codeInput.focus();
-                    }
-                });
-            }
-            // Kod kiritish maydoniga yozganda xato chegarasini olib tashlash
-            const codeInput = document.getElementById('2fa-code');
-            if(codeInput) {
-                codeInput.addEventListener('input', (e) => { e.target.style.borderColor = ''; });
-            }
-
-            update2faUI(); // Boshlang'ich UI holatini o'rnatish
-
-
-            // --- Faol Sessiyalar ---
-            const sessionList = document.getElementById('session-list');
-            const logoutAllBtn = document.getElementById('logout-all-btn');
-            // Demo sessiya ma'lumotlari (tarjima qilingan matnlar bilan)
-            const demoSessions = [
-                { id: 1, browser: 'Chrome 125', os: 'Windows 11', ip: '192.168.1.10 (Taxminan)', location: 'Toshkent, UZ (Taxminan)', last_active: 'Hozirgina', current: true }, // Tarjima qilindi
-                { id: 2, browser: 'Safari 17', os: 'macOS Sonoma', ip: '10.0.0.5 (Taxminan)', location: 'Samarqand, UZ (Taxminan)', last_active: '2 soat oldin', current: false }, // Tarjima qilindi
-                { id: 3, browser: 'Firefox 126', os: 'Linux', ip: '8.8.8.8 (Taxminan)', location: 'Noma\'lum', last_active: '1 kun oldin', current: false }, // Tarjima qilindi
-             ];
-
-             // Sessiyalar ro'yxatini render qilish funksiyasi
-            function renderSessions() {
-                 if (!sessionList) return;
-                 const placeholder = sessionList.querySelector('.session-item-placeholder');
-                 if(placeholder) placeholder.remove(); // Yuklanish indikatorini olib tashlash
-                 sessionList.innerHTML = ''; // Ro'yxatni tozalash
-
-                 demoSessions.forEach(session => {
-                     const li = document.createElement('li');
-                     li.style.display = 'flex';
-                     li.style.alignItems = 'center';
-                     li.style.gap = '15px';
-                     li.style.padding = '15px 0';
-                     li.style.borderBottom = '1px solid var(--border-color)';
-
-                     // Brauzerga mos ikonkani tanlash
-                     let iconClass = 'fa-solid fa-desktop'; // Standart
-                     if (session.browser.toLowerCase().includes('chrome')) iconClass = 'fa-brands fa-chrome';
-                     else if (session.browser.toLowerCase().includes('firefox')) iconClass = 'fa-brands fa-firefox-browser';
-                     else if (session.browser.toLowerCase().includes('safari')) iconClass = 'fa-brands fa-safari';
-                     else if (session.browser.toLowerCase().includes('edge')) iconClass = 'fa-brands fa-edge';
-                     else if (session.browser.toLowerCase().includes('opera')) iconClass = 'fa-brands fa-opera';
-
-                     li.innerHTML = `
-                        <i class="${iconClass} fa-2x" style="color: var(--text-light); width: 30px; text-align: center;"></i>
-                        <div style="flex-grow: 1;">
-                            <strong>${session.browser} / ${session.os}</strong>
-                            ${session.current ? '<span class="status-badge status-approved" style="margin-left: 5px; padding: 3px 8px; font-size: 0.7rem;">Joriy</span>' : ''} <!-- Tarjima qilindi -->
-                            <br>
-                            <small style="color: var(--text-light); font-size: 0.85rem;">
-                                ${session.location} - IP: ${session.ip} - Faol: ${session.last_active} <!-- Tarjima qilindi -->
-                            </small>
-                        </div>
-                        ${!session.current ? `<button class="btn btn-danger btn-sm logout-session-btn" data-sessionid="${session.id}">Tugatish</button>` : ''} <!-- Tarjima qilindi -->
-                     `;
-                     sessionList.appendChild(li);
-                 });
-
-                 // "Tugatish" tugmalari uchun event listener'lar
-                 sessionList.querySelectorAll('.logout-session-btn').forEach(btn => {
-                     btn.addEventListener('click', (e) => {
-                         const sessionId = e.currentTarget.dataset.sessionid;
-                         if (confirm(`#${sessionId} raqamli sessiyani tugatmoqchimisiz?`)) { // Tarjima qilindi
-                             // Keraksiz console.log olib tashlandi
-                              if(typeof showToast === 'function') showToast(`#${sessionId} sessiya tugatildi (demo).`, 'Muvaffaqiyatli', 'success'); // Tarjima qilindi
-                             // Demo ma'lumotlardan o'chirish
-                             const sessionIndex = demoSessions.findIndex(s => s.id == sessionId);
-                             if(sessionIndex > -1) {
-                                 demoSessions.splice(sessionIndex, 1);
-                                 e.currentTarget.closest('li')?.remove(); // Elementni DOMdan o'chirish
-                                 // Agar boshqa sessiya qolmagan bo'lsa, xabar chiqarish
-                                 if (sessionList.children.length === 0){
-                                      sessionList.innerHTML = `<li style="padding: 15px 0; color: var(--text-light);">Boshqa faol sessiyalar yo'q.</li>`; // Tarjima qilindi
-                                 }
-                             }
-                         }
-                     });
-                 });
-             }
-
-            // Barcha boshqa sessiyalarni tugatish tugmasi
-            if (logoutAllBtn) {
-                logoutAllBtn.addEventListener('click', () => {
-                    if (confirm('Barcha boshqa faol sessiyalarni tugatmoqchimisiz?')) { // Tarjima qilindi
-                        // Keraksiz console.log olib tashlandi
-                         if(typeof showToast === 'function') showToast('Barcha boshqa sessiyalar tugatildi (demo).', 'Muvaffaqiyatli', 'success'); // Tarjima qilindi
-                        // Faqat joriy sessiyani qoldirish
-                        const currentSession = demoSessions.find(s => s.current);
-                        demoSessions.length = 0; // Massivni tozalash
-                        if (currentSession) demoSessions.push(currentSession); // Joriy sessiyani qayta qo'shish
-                        renderSessions(); // Ro'yxatni yangilash
-                    }
-                });
-            }
-
-            // Sessiyalar ro'yxatini kechikish bilan render qilish
-            setTimeout(renderSessions, 700);
-
-            // Yon panel va headerdagi foydalanuvchi ma'lumotlarini yuklash
-            // (Bu kod profile_settings.html dan ko'chirilgan, kerak bo'lsa moslashtirish mumkin)
-            const currentUserId = 9; // Demo user ID
-            const currentUser = typeof findApplicant === 'function' ? findApplicant(currentUserId) : null;
-            const sidebarAvatar = document.getElementById('sidebar-avatar');
-            const sidebarUserName = document.getElementById('sidebar-user-name');
-            const sidebarUserRole = document.getElementById('sidebar-user-role');
-            const headerAvatar = document.getElementById('header-avatar');
-
-            if (currentUser) {
-                 if (sidebarAvatar) sidebarAvatar.src = currentUser.avatar || `https://ui-avatars.com/api/?name=${currentUser?.name?.split(' ').map(n=>n[0]).join('') || '??'}&background=random&size=40`;
-                 if (headerAvatar) headerAvatar.src = currentUser.avatar || `https://ui-avatars.com/api/?name=${currentUser?.name?.split(' ').map(n=>n[0]).join('') || '??'}&background=random&size=40`;
-                 if (sidebarUserName) sidebarUserName.textContent = currentUser.name || 'Foydalanuvchi';
-                 // Rolni tarjima qilish (agar roleTranslations mavjud bo'lsa)
-                 const translatedRole = (typeof roleTranslations !== 'undefined' && roleTranslations[currentUser.role]) ? roleTranslations[currentUser.role] : currentUser.role;
-                 if (sidebarUserRole) sidebarUserRole.textContent = translatedRole || 'Noma\'lum rol';
-            }
-
-
-        });
-    </script>
-</body>
-</html>
+{% block extra_scripts %}
+{# 2FA va Sessiyalar uchun JS kod #}
+<script>
+    // ... (security.html uchun JS kodini oldingi javobdan oling) ...
+    // Bu JS backend API endpointlari bilan ishlashi kerak bo'ladi (2FA yoqish/o'chirish, QR kod olish, sessiyalarni olish/tugatish)
+</script>
 {% endblock %}

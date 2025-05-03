@@ -1,427 +1,156 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+<div class="main-content-wrapper">
+    <!-- Header -->
+     <header class="main-header">
+        <div class="header-left">
+           <button class="menu-toggle-btn" id="menu-toggle" title="Menyuni yig'ish/kengaytirish" aria-label="Menyu">
+               <i class="fa-solid fa-bars"></i>
+           </button>
+       </div>
+       <div class="header-right">
+       </div>
+   </header>
 
-        <!-- ======================= ASOSIY KONTENT O'RAMI ======================= -->
-        <div class="main-content-wrapper">
-            <!-- ======================= YUQORI PANEL (HEADER) ======================= -->
-             <header class="main-header">
-                 <div class="header-left">
-                    <button class="menu-toggle-btn" id="menu-toggle" title="Menyuni yig'ish/ochish" aria-label="Menyu"> <!-- Title va aria-label tarjima qilindi -->
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-                </div>
-                <div class="header-right">
-                    <!-- Boshqa header elementlari (agar mavjud bo'lsa) -->
-                </div>
-            </header>
-
-            <!-- ======================= SAHIFA KONTENTI ======================= -->
-            <main class="page-content">
-                <h1 class="page-title">Mening Arizalarim</h1> <!-- Sarlavha tarjima qilindi -->
-                <div class="animate-on-load">
-                    <div class="card-table-wrapper">
-                        <div class="table-header-controls">
-                            <h2 class="table-title">Mening yuborgan arizalarim roʻyxati</h2> <!-- Sarlavha tarjima qilindi -->
-                            <div class="table-filters">
-                                <div class="table-search">
-                                    <i class="fa-solid fa-magnifying-glass"></i>
-                                    <input type="text" id="my-apps-search-input" placeholder="Stipendiya, status boʻyicha qidirish..." aria-label="Mening arizalarim boʻyicha qidirish"> <!-- Placeholder va aria-label tarjima qilindi -->
-                                </div>
-                                <div class="table-actions">
-                                     <select id="my-apps-status-filter" class="btn btn-secondary btn-sm" style="height: 36px; padding-right: 30px;" aria-label="Status boʻyicha filtr"> <!-- aria-label tarjima qilindi -->
-                                         <option value="">Barcha statuslar</option> <!-- Tarjima qilindi -->
-                                         <option value="Tasdiqlangan">Tasdiqlangan</option> <!-- Tarjima qilindi -->
-                                         <option value="Koʻrib chiqilmoqda">Koʻrib chiqilmoqda</option> <!-- Tarjima qilindi -->
-                                         <option value="Rad etilgan">Rad etilgan</option> <!-- Tarjima qilindi -->
-                                         <option value="Yuborilgan">Yuborilgan</option> <!-- Tarjima qilindi -->
-                                         <option value="Aniq­lash­tirish talab qili­nadi">Aniq­lash­tirish talab qili­nadi</option> <!-- Tarjima qilindi -->
-                                     </select>
-                                    <a href="find_scholarships.html" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> Yangi ariza yuborish</a> <!-- Tarjima qilindi -->
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="cool-table" id="my-applications-table">
-                                <thead>
-                                    <tr>
-                                        <!-- Arizachi ustuni olib tashlandi -->
-                                        <th data-sort="scholarship">Stipendiya <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
-                                        <th data-sort="date">Yuborilgan sana <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
-                                        <th data-sort="updateDate">Yangilandi <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
-                                        <th data-sort="status">Status <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
-                                        <th>Harakatlar</th> <!-- Tarjima qilindi -->
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="table-placeholder">
-                                         <td colspan="5" style="text-align: center; padding: 50px 0; color: var(--text-light);">
-                                             <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                                             <p>Arizalaringiz yuklanmoqda...</p> <!-- Tarjima qilindi -->
-                                         </td>
-                                     </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="pagination-wrapper" id="my-apps-pagination">
-                            <!-- Sahifalash (Pagination) -->
-                        </div>
-                    </div>
-                     <!-- Ariza tafsilotlari uchun bo'lim (modal yoki pastda paydo bo'lishi mumkin) -->
-                    <div id="application-details-section" style="display: none; margin-top: 30px; background-color: #f8f9fa; padding: 25px; border-radius: var(--border-radius-lg); border: 1px solid var(--border-color);">
-                         <h3 style="margin-bottom: 15px;">Ariza tafsilotlari #<span id="details-app-id"></span></h3> <!-- Tarjima qilindi -->
-                         <p><strong>Stipendiya:</strong> <span id="details-scholarship"></span></p> <!-- Tarjima qilindi -->
-                         <p><strong>Status:</strong> <span id="details-status-badge"></span></p> <!-- Tarjima qilindi -->
-                         <p><strong>Yuborilgan sana:</strong> <span id="details-submit-date"></span></p> <!-- Tarjima qilindi -->
-                         <p><strong>Oxirgi yangilanish:</strong> <span id="details-update-date"></span></p> <!-- Tarjima qilindi -->
-                         <div id="details-notes-wrapper" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
-                            <strong>Ko'rib chiquvchi izohlari:</strong> <!-- Tarjima qilindi -->
-                            <p id="details-notes" style="margin-top: 5px; color: var(--text-medium);"></p>
+    <!-- Sahifa kontenti -->
+    <main class="page-content">
+        <h1 class="page-title">Mening Arizalarim</h1>
+        <div class="animate-on-load">
+            <div class="card-table-wrapper">
+                <div class="table-header-controls">
+                    <h2 class="table-title">Mening yuborgan arizalarim roʻyxati</h2>
+                     <form method="get" class="table-filters"> {# Formaga o'rash #}
+                         <div class="table-search">
+                             <i class="fa-solid fa-magnifying-glass"></i>
+                             <input type="text" name="search" id="my-apps-search-input" placeholder="Stipendiya, status boʻyicha qidirish..." value="{{ request.GET.search|default:'' }}">
                          </div>
-                         <button class="btn btn-secondary btn-sm" id="close-details-btn" style="margin-top: 20px;">Tafsilotlarni yopish</button> <!-- Tarjima qilindi -->
-                    </div>
+                         <div class="table-actions">
+                              <select name="status_filter" id="my-apps-status-filter" class="btn btn-secondary btn-sm" style="height: 38px;">
+                                  <option value="">Barcha statuslar</option>
+                                   {% for value, display in status_choices %}
+                                      {# Tarjima qilingan display nomlarini ishlatish kerak #}
+                                      <option value="{{ value }}" {% if request.GET.status_filter == value %}selected{% endif %}>{{ display }}</option>
+                                  {% endfor %}
+                              </select>
+                               <button type="submit" class="btn btn-light btn-sm"><i class="fa-solid fa-filter"></i> Filtr</button>
+                               <a href="{% url 'my_applications' %}" class="btn btn-secondary btn-sm"><i class="fa-solid fa-times"></i> Tozalash</a>
+                             <a href="{% url 'find_scholarships' %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> Yangi ariza yuborish</a>
+                         </div>
+                     </form>
                 </div>
-            </main>
-
-            <!-- ======================= PASTKI QISM (FOOTER) ======================= -->
-            <footer class="main-footer">
-                 🚀 “Shaffof Imkon” Boshqaruv Paneli v1.1 | Halol kelajak uchun <i class="fa-solid fa-heart" style="color: #e1335a;"></i> bilan yaratilgan | <a href="#">Loyihani qoʻllab-quvvatlash</a> <!-- Tarjima qilindi -->
-            </footer>
+                <div class="table-responsive">
+                    <table class="cool-table" id="my-applications-table">
+                        <thead>
+                            <tr>
+                                <th>Stipendiya</th>
+                                <th>Yuborilgan sana</th>
+                                <th>Yangilandi</th>
+                                <th>Status</th>
+                                <th>Harakatlar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in page_obj %}
+                            <tr>
+                                <td>{{ app.scholarship.name }}</td>
+                                <td>{{ app.submission_date|date:"Y-m-d H:i" }}</td>
+                                <td>{{ app.last_updated|date:"Y-m-d H:i" }}</td>
+                                <td><span class="status-badge status-{{ app.status }}"><i class="fa-solid {% if app.status == 'approved' %}fa-check-circle{% elif app.status == 'rejected' %}fa-times-circle{% elif app.status == 'reviewing' %}fa-clock{% elif app.status == 'clarification' %}fa-exclamation-circle{% elif app.status == 'withdrawn' %}fa-undo{% else %}fa-paper-plane{% endif %}"></i> {{ app.get_status_display }}</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="view-btn" title="Tafsilotlarni koʻrish" data-appid="{{ app.id }}"><i class="fa-solid fa-eye"></i></button>
+                                        {% if app.status == 'clarification' %}
+                                            {# Tahrirlash/aniqlashtirish uchun submit_application sahifasiga link #}
+                                            <a href="{% url 'submit_application' %}?application_id={{ app.id }}" class="edit-btn" title="Aniq­lash­tirishlar kiritish"><i class="fa-solid fa-pen"></i></a>
+                                        {% endif %}
+                                        {% if app.status == 'submitted' or app.status == 'clarification' %}
+                                            {# Arizani qaytarib olish (AJAX bo'lishi mumkin) #}
+                                            <button class="withdraw-btn" title="Arizani qaytarib olish" data-appid="{{ app.id }}"><i class="fa-solid fa-trash-can"></i></button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 40px 0;"><i class="fa-regular fa-folder-open" style="font-size: 1.5rem; display: block; margin-bottom: 10px;"></i>Siz hali ariza yubormagansiz yoki filtr boʻyicha topilmadi.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+             <!-- Ariza tafsilotlari (JS tomonidan boshqariladi) -->
+            <div id="application-details-section" style="display: none; margin-top: 30px; background-color: #f8f9fa; padding: 25px; border-radius: var(--border-radius-lg); border: 1px solid var(--border-color);">
+                 <h3 style="margin-bottom: 15px;">Ariza tafsilotlari #<span id="details-app-id"></span></h3>
+                 <p><strong>Stipendiya:</strong> <span id="details-scholarship"></span></p>
+                 <p><strong>Status:</strong> <span id="details-status-badge"></span></p>
+                 <p><strong>Yuborilgan sana:</strong> <span id="details-submit-date"></span></p>
+                 <p><strong>Oxirgi yangilanish:</strong> <span id="details-update-date"></span></p>
+                 <div id="details-notes-wrapper" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                    <strong>Ko'rib chiquvchi izohlari:</strong>
+                    <p id="details-notes" style="margin-top: 5px; color: var(--text-medium); white-space: pre-wrap;"></p> {# Izohlar formatini saqlash uchun #}
+                 </div>
+                 <button class="btn btn-secondary btn-sm" id="close-details-btn" style="margin-top: 20px;">Tafsilotlarni yopish</button>
+            </div>
         </div>
-    </div>
+    </main>
+    <!-- Footer -->
+</div>
+{% endblock content %}
 
-    <!-- ======================= XABARNOMALAR UCHUN KONTEYNER ======================= -->
-    <div class="notifications-container" id="notifications-container"></div>
+{% block extra_scripts %}
+{# Tafsilotlarni ko'rsatish va qaytarib olish uchun JS #}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const detailsSection = document.getElementById('application-details-section');
+    const closeDetailsBtn = document.getElementById('close-details-btn');
 
-    <!-- Skriptlarni ulash -->
-    <script src="{% static 'js/data_uz.js' %}"></script> <!-- Data fayli ham tarjima qilingan deb hisoblaymiz (data_uz.js) -->
-    <script src="{% static 'js/script.js' %}"></script>
-    <script src="{% static 'js/chart-config.js' %}"></script>
-    <!-- my_applications.html uchun maxsus JS -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log("Mening Arizalarim sahifasi uchun maxsus JS yuklandi"); // Tarjima qilindi
-
-            // Joriy foydalanuvchi IDsi (Aydos Erbolatov)
-            const currentUserId = 9;
-
-            const tableBody = document.querySelector('#my-applications-table tbody');
-            const placeholderRow = document.querySelector('#my-applications-table .table-placeholder');
-            const paginationWrapper = document.getElementById('my-apps-pagination');
-            const searchInput = document.getElementById('my-apps-search-input');
-            const statusFilter = document.getElementById('my-apps-status-filter');
-            const detailsSection = document.getElementById('application-details-section');
-            const closeDetailsBtn = document.getElementById('close-details-btn');
-
-            let currentPage = 1;
-            const rowsPerPage = 10;
-            let userApplications = [];
-            let currentTableData = []; // Filtrlangan va saralangan ma'lumotlar
-            let currentSort = { column: 'date', direction: 'desc' };
-
-            // Status nomlari va ikonkalari (tarjima qilingan)
-             const statusClasses = {
-                'Tasdiqlangan': 'status-approved',
-                'Koʻrib chiqilmoqda': 'status-pending',
-                'Rad etilgan': 'status-rejected',
-                'Yuborilgan': 'status-submitted',
-                'Aniq­lash­tirish talab qili­nadi': 'status-clarification'
-             };
-             const statusIcons = {
-                'Tasdiqlangan': 'fa-solid fa-check-circle',
-                'Koʻrib chiqilmoqda': 'fa-regular fa-clock',
-                'Rad etilgan': 'fa-solid fa-times-circle',
-                'Yuborilgan': 'fa-solid fa-paper-plane',
-                'Aniq­lash­tirish talab qili­nadi': 'fa-solid fa-exclamation-circle'
-             };
-
-
-            // Jadval qatorlarini render qilish funksiyasi
-            function renderMyTableRows(data) {
-                 tableBody.innerHTML = '';
-                 if (data.length === 0) {
-                    // Ma'lumot yo'qligi haqidagi xabar (tarjima qilingan)
-                    tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px 0; color: var(--text-light);"><i class="fa-regular fa-folder-open" style="font-size: 1.5rem; display: block; margin-bottom: 10px;"></i>Siz hali ariza yubormagansiz yoki filtr boʻyicha topilmadi.</td></tr>`;
-                     return;
-                 }
-                 const startIndex = (currentPage - 1) * rowsPerPage;
-                 const endIndex = startIndex + rowsPerPage;
-                 const paginatedData = data.slice(startIndex, endIndex);
-
-                 paginatedData.forEach((item, index) => {
-                    // Stipendiyani topish (data_uz.js dagi findScholarship funksiyasidan)
-                    const scholarship = findScholarship(item.scholarshipId);
-                    if (!scholarship) return; // Agar stipendiya topilmasa, qatorni o'tkazib yuboring
-
-                    const row = document.createElement('tr');
-                    row.style.opacity = '0'; // Animatsiya uchun boshlang'ich holat
-
-                    row.innerHTML = `
-                        <td>${scholarship.name}</td>
-                        <td>${item.date}</td>
-                        <td>${item.updateDate}</td>
-                        <td><span class="status-badge ${statusClasses[item.status] || 'status-clarification'}"><i class="${statusIcons[item.status] || 'fa-solid fa-question-circle'}"></i> ${item.status}</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <!-- Tugma title'lari tarjima qilindi -->
-                                <button class="view-btn" title="Tafsilotlarni koʻrish" data-appid="${item.id}"><i class="fa-solid fa-eye"></i></button>
-                                ${item.status === 'Aniq­lash­tirish talab qili­nadi' ? `<button class="edit-btn" title="Aniq­lash­tirishlar kiritish"><i class="fa-solid fa-pen"></i></button>` : ''}
-                                ${item.status === 'Yuborilgan' || item.status === 'Aniq­lash­tirish talab qili­nadi' ? `<button class="delete-btn" title="Arizani qaytarib olish"><i class="fa-solid fa-trash-can"></i></button>` : ''}
-                            </div>
-                        </td>`;
-                    tableBody.appendChild(row);
-                    // Animatsiya bilan paydo bo'lishi
-                    setTimeout(() => {
-                        row.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-                        row.style.opacity = '1';
-                        row.style.transform = 'translateY(0)';
-                    }, 50 * index); // Har bir qator ketma-ket paydo bo'ladi
-                 });
-                 addTableActionListeners(); // Qator tugmalariga tinglovchilarni qo'shish
-            }
-
-            // Sahifalashni render qilish funksiyasi (o'zgartirilgan matnlar bilan)
-            function renderMyPagination(totalRows) {
-                 if (!paginationWrapper) return;
-                 paginationWrapper.innerHTML = '';
-                 const totalPages = Math.ceil(totalRows / rowsPerPage);
-                 if (totalPages <= 1) return; // Agar faqat bitta sahifa bo'lsa, sahifalashni ko'rsatmang
-
-                 const startRow = (currentPage - 1) * rowsPerPage + 1;
-                 const endRow = Math.min(currentPage * rowsPerPage, totalRows);
-
-                 // Ma'lumot matni (tarjima qilingan)
-                 const infoSpan = document.createElement('span');
-                 infoSpan.classList.add('pagination-info');
-                 infoSpan.textContent = `${totalRows} arizadan ${startRow}-${endRow} koʻrsatilmoqda`;
-                 paginationWrapper.appendChild(infoSpan);
-
-                 const controlsDiv = document.createElement('div');
-                 controlsDiv.classList.add('pagination-controls');
-
-                 // Orqaga tugmasi (tarjima qilingan)
-                 const prevButton = document.createElement('button');
-                 prevButton.classList.add('btn', 'btn-secondary', 'btn-sm');
-                 prevButton.innerHTML = '« Orqaga';
-                 prevButton.disabled = currentPage === 1;
-                 prevButton.addEventListener('click', () => {
-                     if (currentPage > 1) {
-                         currentPage--;
-                         renderMyTableRows(currentTableData);
-                         renderMyPagination(totalRows);
-                     }
-                 });
-                 controlsDiv.appendChild(prevButton);
-
-                 // Oldinga tugmasi (tarjima qilingan)
-                 const nextButton = document.createElement('button');
-                 nextButton.classList.add('btn', 'btn-secondary', 'btn-sm');
-                 nextButton.innerHTML = 'Oldinga »';
-                 nextButton.disabled = currentPage === totalPages;
-                 nextButton.addEventListener('click', () => {
-                     if (currentPage < totalPages) {
-                         currentPage++;
-                         renderMyTableRows(currentTableData);
-                         renderMyPagination(totalRows);
-                     }
-                 });
-                 controlsDiv.appendChild(nextButton);
-
-                 paginationWrapper.appendChild(controlsDiv);
-            }
-
-            // Ma'lumotlarni saralash funksiyasi (o'zgartirilgan)
-             function sortMyData(data, column, direction) {
-                // data_uz.js dagi findScholarship funksiyasini ishlatadi
-                return [...data].sort((a, b) => {
-                    let valA, valB;
-                    const scholarshipA = findScholarship(a.scholarshipId);
-                    const scholarshipB = findScholarship(b.scholarshipId);
-
-                    switch(column) {
-                        case 'scholarship':
-                            valA = scholarshipA ? scholarshipA.name.toLowerCase() : '';
-                            valB = scholarshipB ? scholarshipB.name.toLowerCase() : '';
-                            break;
-                        case 'date':
-                            // Sanalarni to'g'ri taqqoslash uchun Date obyektiga o'tkazish
-                            // Format 'YYYY-MM-DD' deb hisoblanadi
-                            valA = new Date(a.date);
-                            valB = new Date(b.date);
-                            break;
-                        case 'updateDate':
-                            valA = new Date(a.updateDate);
-                            valB = new Date(b.updateDate);
-                            break;
-                        case 'status':
-                            valA = a.status.toLowerCase();
-                            valB = b.status.toLowerCase();
-                            break;
-                        default: // Standart saralash (sana bo'yicha)
-                            valA = new Date(a.date);
-                            valB = new Date(b.date);
-                    }
-
-                    // Taqqoslash logikasi
-                    if (valA < valB) return direction === 'asc' ? -1 : 1;
-                    if (valA > valB) return direction === 'asc' ? 1 : -1;
-                    return 0; // Agar qiymatlar teng bo'lsa
-                });
-            }
-
-            // Filtrlash va jadvalni yangilash
-             function filterAndDisplayMyApps() {
-                 const searchTerm = searchInput.value.toLowerCase().trim();
-                 const selectedStatus = statusFilter.value; // Status filtridan tanlangan qiymat
-                 currentPage = 1; // Har qanday filtr yoki qidiruvda birinchi sahifaga qaytish
-
-                 // Foydalanuvchining arizalarini filtrlash
-                 const filtered = userApplications.filter(item => {
-                     // Har bir ariza uchun stipendiyani topish
-                     const scholarship = findScholarship(item.scholarshipId);
-
-                     // Qidiruv shartlari
-                     const nameMatch = scholarship ? scholarship.name.toLowerCase().includes(searchTerm) : false;
-                     const statusMatchFilter = !selectedStatus || item.status === selectedStatus; // Status filtri bo'yicha moslik
-                     const statusMatchSearch = item.status.toLowerCase().includes(searchTerm); // Qidiruv maydoni orqali statusni qidirish
-                     const dateMatch = item.date.includes(searchTerm); // Sana bo'yicha qidirish (string sifatida)
-
-                     // Yakuniy filtr sharti: qidiruv maydonidagi moslik (nom, status yoki sana bo'yicha) VA status filtriga moslik
-                     return (nameMatch || statusMatchSearch || dateMatch) && statusMatchFilter;
-                 });
-
-                 // Filtrlangan ma'lumotlarni joriy saralash bo'yicha tartiblash
-                 currentTableData = sortMyData(filtered, currentSort.column, currentSort.direction);
-
-                 // Jadvalni va sahifalashni qayta render qilish
-                 renderMyTableRows(currentTableData);
-                 renderMyPagination(currentTableData.length);
-             }
-
-             // Ariza tafsilotlarini ko'rsatish
-            function showDetails(appId) {
-                const application = userApplications.find(app => app.id === appId);
-                // data_uz.js dagi findScholarship ni ishlatish
-                const scholarship = findScholarship(application?.scholarshipId);
-
-                if (!application || !scholarship || !detailsSection) return; // Agar ma'lumot topilmasa yoki bo'lim mavjud bo'lmasa, chiqish
-
-                 // Tafsilotlar bo'limidagi elementlarni to'ldirish (tarjima qilingan statuslar bilan)
-                 document.getElementById('details-app-id').textContent = application.id;
-                 document.getElementById('details-scholarship').textContent = scholarship.name;
-                 document.getElementById('details-status-badge').innerHTML = `<span class="status-badge ${statusClasses[application.status] || 'status-clarification'}"><i class="${statusIcons[application.status] || 'fa-solid fa-question-circle'}"></i> ${application.status}</span>`;
-                 document.getElementById('details-submit-date').textContent = application.date;
-                 document.getElementById('details-update-date').textContent = application.updateDate;
-
-                 const notesWrapper = document.getElementById('details-notes-wrapper');
-                 const notesP = document.getElementById('details-notes');
-                 if (application.reviewNotes) {
-                     notesP.textContent = application.reviewNotes;
-                     notesWrapper.style.display = 'block';
-                 } else {
-                    notesP.textContent = 'Izohlar yoʻq.'; // Tarjima qilingan
-                    notesWrapper.style.display = 'block'; // Izohlar bo'lmasa ham ko'rsatish
-                 }
-
-                 // Tafsilotlar bo'limini ko'rsatish va unga silliq o'tish
-                 detailsSection.style.display = 'block';
-                 detailsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-
-            // Tafsilotlarni yashirish
-            if(closeDetailsBtn) {
-                 closeDetailsBtn.addEventListener('click', () => {
-                    if(detailsSection) detailsSection.style.display = 'none';
-                 });
-            }
-
-            // Jadvaldagi harakat tugmalariga tinglovchilarni qo'shish
-            function addTableActionListeners() {
-                 // Ko'rish tugmalari
-                 tableBody.querySelectorAll('.view-btn').forEach(btn => {
-                     btn.addEventListener('click', (e) => {
-                         const appId = parseInt(e.currentTarget.dataset.appid);
-                         showDetails(appId);
-                     });
-                 });
-
-                 // O'chirish (qaytarib olish) tugmalari
-                 tableBody.querySelectorAll('.delete-btn').forEach(btn => {
-                      btn.addEventListener('click', () => {
-                          // Tasdiqlash so'rovi (tarjima qilingan)
-                          if (confirm('Haqiqatan ham bu arizani qaytarib olmoqchimisiz? Bu amalni bekor qilib boʻlmaydi.')) {
-                              // Demo uchun xabarnoma (tarjima qilingan)
-                              showToast('Ariza muvaffaqiyatli qaytarib olindi (demo).', 'Qaytarib olindi', 'warning');
-                              // Haqiqiy ilovada: serverga o'chirish so'rovini yuborish kerak
-                              // So'ngra jadvalni yangilash: filterAndDisplayMyApps();
-                          }
-                      });
-                 });
-
-                 // Tahrirlash tugmalari (kerak bo'lsa, shunga o'xshash qo'shiladi)
-                 // tableBody.querySelectorAll('.edit-btn').forEach(btn => { ... });
-            }
-
-
-             // Sahifani ishga tushirish funksiyasi
-            function initMyAppsPage() {
-                 if(placeholderRow) placeholderRow.style.display = 'none'; // Yuklash indikatorini yashirish
-
-                 // demoApplications ni data_uz.js dan olish kerak
-                 // Agar data_uz.js yuklanmagan bo'lsa, xatolik yuz berishi mumkin
-                 if (typeof demoApplications === 'undefined') {
-                     console.error("demoApplications topilmadi. data_uz.js faylini tekshiring.");
-                     tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px 0; color: var(--text-danger);"><i class="fa-solid fa-triangle-exclamation" style="font-size: 1.5rem; display: block; margin-bottom: 10px;"></i> Ma'lumotlarni yuklashda xatolik.</td></tr>`;
-                     return;
-                 }
-
-                 // Joriy foydalanuvchining arizalarini filtrlash
-                 userApplications = demoApplications.filter(app => app.applicantId === currentUserId);
-                 console.log(`Foydalanuvchi ID ${currentUserId} uchun ${userApplications.length} ta ariza topildi`);
-
-                 filterAndDisplayMyApps(); // Birinchi render (barcha statuslar va sana bo'yicha saralash bilan)
-                 updateMySortHeaders(); // Saralash sarlavhalarini yangilash
-            }
-
-            // Saralash sarlavhalari UI'sini yangilash
-             function updateMySortHeaders() {
-                myTableHeaders.forEach(h => {
-                     h.classList.remove('sort-asc', 'sort-desc'); // Avvalgi saralash klasslarini olib tashlash
-                     // Agar bu sarlavha joriy saralash ustuniga mos kelsa, tegishli klassni qo'shish
-                     if (h.getAttribute('data-sort') === currentSort.column) {
-                         h.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
-                     }
-                 });
-             }
-
-            // Saralash uchun sarlavhalarga tinglovchi qo'shish
-            const myTableHeaders = document.querySelectorAll('#my-applications-table th[data-sort]');
-             myTableHeaders.forEach(header => {
-                 header.addEventListener('click', () => {
-                     const sortColumn = header.getAttribute('data-sort'); // Saralash ustuni nomi
-                     let sortDirection = 'asc'; // Standart yo'nalish
-
-                     // Agar shu ustun allaqachon saralanayotgan bo'lsa, yo'nalishni o'zgartirish
-                     if (currentSort.column === sortColumn) {
-                         sortDirection = currentSort.direction === 'asc' ? 'desc' : 'asc';
-                     }
-
-                     // Joriy saralash holatini yangilash
-                     currentSort = { column: sortColumn, direction: sortDirection };
-
-                     filterAndDisplayMyApps(); // Yangi saralash bilan jadvalni qayta render qilish
-                     updateMySortHeaders(); // Saralash sarlavhalari ikonalarini yangilash
-                 });
-             });
-
-            // Filtr tinglovchilari
-            searchInput.addEventListener('input', filterAndDisplayMyApps); // Qidiruv maydoniga yozganda
-            statusFilter.addEventListener('change', filterAndDisplayMyApps); // Status filtrini o'zgartirganda
-
-            // Sahifani ishga tushirishni biroz kechiktirish (vizual effekt uchun)
-            setTimeout(initMyAppsPage, 300);
+    // "Ko'rish" tugmalari
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const appId = e.currentTarget.dataset.appid;
+            // TODO: AJAX orqali backenddan ariza tafsilotlarini olish
+            // Masalan: fetch(`/api/my-applications/${appId}/`)
+            // .then(...)
+            // .then(data => { ... ma'lumotlarni joylashtirish ... })
+             // --- DEMO uchun statik ma'lumot ---
+             document.getElementById('details-app-id').textContent = appId;
+             // Quyidagi ma'lumotlar AJAX javobidan kelishi kerak
+             document.getElementById('details-scholarship').textContent = "Demo Stipendiya Nomi";
+             document.getElementById('details-status-badge').innerHTML = '<span class="status-badge status-reviewing"><i class="fa-solid fa-clock"></i> Koʻrib chiqilmoqda</span>';
+             document.getElementById('details-submit-date').textContent = "2024-05-20 10:00";
+             document.getElementById('details-update-date').textContent = "2024-05-21 15:30";
+             document.getElementById('details-notes').textContent = "Hujjatlaringizni qayta tekshiring.\nImzo aniq emas.";
+             detailsSection.style.display = 'block';
+             detailsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+             // --- DEMO tugadi ---
         });
-    </script>
-</body>
-</html>
+    });
+
+     // Tafsilotlarni yopish
+    if (closeDetailsBtn) {
+        closeDetailsBtn.addEventListener('click', () => { detailsSection.style.display = 'none'; });
+    }
+
+    // "Qaytarib olish" tugmalari
+    document.querySelectorAll('.withdraw-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const button = e.currentTarget;
+            const appId = button.dataset.appid;
+            if (confirm('Haqiqatan ham bu arizani qaytarib olmoqchimisiz?')) {
+                 // TODO: AJAX orqali backendga POST so'rov yuborish
+                 // Masalan: fetch(`/api/my-applications/${appId}/withdraw/`, { method: 'POST', headers: {'X-CSRFToken': ...} })
+                 // .then(...)
+                 // .then(data => { ... muvaffaqiyatli bo'lsa qatorni o'chirish yoki statusni yangilash ... })
+
+                 // --- DEMO uchun ---
+                 showToast(`Ariza #${appId} qaytarib olindi (demo).`, 'Muvaffaqiyatli', 'warning');
+                 button.closest('tr')?.remove(); // Qatorni o'chirish
+                 // --- DEMO tugadi ---
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

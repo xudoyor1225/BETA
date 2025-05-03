@@ -1,506 +1,580 @@
 {% extends 'base.html' %}
 {% load static %}
+{# Load custom template tags if you created the filter #}
+
 {% block content %}
-
-
-
-
-        <!-- Yon panel -->
-
-
-        <!-- Asosiy kontent uchun o'ram -->
-        <div class="main-content-wrapper">
-            <!-- Header -->
-            <header class="main-header">
-                 <div class="header-left">
-                    <button class="menu-toggle-btn" id="menu-toggle" title="Menyuni yig'ish/kengaytirish" aria-label="Menyu"> <!-- Tarjima qilindi -->
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-                </div>
-                <div class="header-right">
-                    <!-- Qidiruv paneli (ixtiyoriy) -->
-                    <!-- <div class="search-bar">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" placeholder="Global qidiruv..." aria-label="Global qidiruv">
-                    </div> -->
-                    <!-- Tezkor harakat tugmalari (agar kerak bo'lsa) -->
-                    <!-- <button class="header-action-icon" title="Ariza yaratish">
-                        <i class="fa-solid fa-plus"></i>
-                    </button> -->
-                    <button class="header-action-icon notifications-btn" title="Bildirishnomalar"> <!-- Tarjima qilindi -->
-                        <i class="fa-regular fa-bell"></i>
-                        <span class="notification-badge" style="display: none;"></span> <!-- Boshida yashirin -->
-                    </button>
-                    <div class="profile-dropdown" title="Profil sozlamalari"> <!-- Tarjima qilindi -->
-                        <img src="https://i.pravatar.cc/40?img=4" alt="Avatar" class="profile-avatar" id="header-avatar">
-                        <!-- Dropdown menyu logikasi qo'shilishi mumkin -->
-                    </div>
-                </div>
-            </header>
-
-            <!-- Sahifa kontenti -->
-            <main class="page-content">
-                <h1 class="page-title">Boshqaruv Paneli</h1> <!-- Tarjima qilindi -->
-                <div class="animate-on-load">
-                    <!-- Statistika kartochkalari -->
-                    <div class="stats-grid">
-                         <div class="stat-card">
-                             <div class="stat-card-header">
-                                 <div class="stat-card-icon-wrapper blue"><i class="fa-solid fa-file-circle-plus"></i></div>
-                                 <div class="stat-card-title">Topshirilgan arizalar (bugun)</div> <!-- Tarjima qilindi -->
-                             </div>
-                             <div class="stat-card-value" data-target="24">0</div>
-                             <div class="stat-card-footer">
-                                 <span class="stat-change positive"><i class="fa-solid fa-arrow-trend-up"></i> +8%</span>
-                                 <span class="stat-period">kechagiga nisbatan</span> <!-- Tarjima qilindi -->
-                             </div>
-                         </div>
-                         <div class="stat-card">
-                             <div class="stat-card-header">
-                                 <div class="stat-card-icon-wrapper green"><i class="fa-solid fa-thumbs-up"></i></div>
-                                 <div class="stat-card-title">Ma'qullangan (oy davomida)</div> <!-- Tarjima qilindi -->
-                             </div>
-                             <div class="stat-card-value" data-target="148">0</div>
-                             <div class="stat-card-footer">
-                                  <span class="stat-change positive"><i class="fa-solid fa-arrow-trend-up"></i> +15%</span>
-                                  <span class="stat-period">oʻtgan oyga nisbatan</span> <!-- Tarjima qilindi -->
-                             </div>
-                         </div>
-                         <div class="stat-card">
-                             <div class="stat-card-header">
-                                 <div class="stat-card-icon-wrapper orange"><i class="fa-solid fa-user-clock"></i></div>
-                                 <div class="stat-card-title">Faol koʻrib chiqilmoqda</div> <!-- Tarjima qilindi -->
-                             </div>
-                             <div class="stat-card-value" data-target="75">0</div>
-                              <div class="stat-card-footer">
-                                  <span class="stat-change negative"><i class="fa-solid fa-arrow-trend-down"></i> -5%</span>
-                                  <span class="stat-period">oʻtgan haftaga nisbatan</span> <!-- Tarjima qilindi -->
-                             </div>
-                         </div>
-                         <div class="stat-card">
-                             <div class="stat-card-header">
-                                 <div class="stat-card-icon-wrapper red"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                                 <div class="stat-card-title">E'tibor talab qiladi</div> <!-- Tarjima qilindi -->
-                             </div>
-                             <div class="stat-card-value" data-target="12">0</div>
-                             <div class="stat-card-footer">
-                                  <span class="stat-change positive"><i class="fa-solid fa-arrow-trend-up"></i> +2</span>
-                                  <span class="stat-period">oxirgi 24 soatda</span> <!-- Tarjima qilindi -->
-                             </div>
-                         </div>
-                    </div>
-
-                    <!-- So'nggi arizalar jadvali -->
-                    <div class="card-table-wrapper">
-                        <div class="table-header-controls">
-                            <h2 class="table-title">Soʻnggi Arizalar</h2> <!-- Tarjima qilindi -->
-                            <div class="table-filters">
-                                <div class="table-search">
-                                    <i class="fa-solid fa-magnifying-glass"></i>
-                                    <input type="text" id="table-search-input" placeholder="Arizalar boʻyicha qidirish..." aria-label="Arizalar boʻyicha qidirish"> <!-- Tarjima qilindi -->
-                                </div>
-                                <div class="table-actions">
-                                    <!-- Keraksiz test tugmalari olib tashlandi -->
-                                    <a href="all_applications.html" class="btn btn-outline-primary btn-sm">Barchasini koʻrish <i class="fa-solid fa-arrow-right"></i></a> <!-- Tarjima qilindi -->
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="cool-table" id="applications-table">
-                                <thead>
-                                    <tr>
-                                        <!-- Saralash ikonkalari qoldirildi -->
-                                        <th data-sort="applicant">Ariza beruvchi <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
-                                        <th data-sort="scholarship">Stipendiya <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
-                                        <th data-sort="date">Yuborilgan sana <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
-                                        <th data-sort="status">Holati <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
-                                        <th>Amallar</th> <!-- Tarjima qilindi -->
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Yuklanish indikatori (JS tomonidan boshqariladi) -->
-                                    <tr class="table-placeholder">
-                                         <td colspan="5" style="text-align: center; padding: 50px 0; color: var(--text-light);">
-                                             <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                                             <p>Maʼlumotlar yuklanmoqda...</p> <!-- Tarjima qilindi -->
-                                         </td>
-                                     </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="pagination-wrapper" id="table-pagination">
-                            <!-- Sahifalash JS orqali render qilinadi -->
-                        </div>
-                    </div>
-
-                    <!-- Ariza holatlari bo'yicha grafik -->
-                    <div class="chart-wrapper futuristic-card">
-                        <div class="chart-header">
-                            <h3 class="chart-title"><i class="fa-solid fa-chart-pie"></i> Ariza Holatlari Tahlili</h3> <!-- Tarjima qilindi -->
-                            <div class="chart-actions">
-                                <button class="btn btn-icon btn-transparent" title="Yangilash"><i class="fa-solid fa-rotate"></i></button> <!-- Tarjima qilindi -->
-                            </div>
-                        </div>
-                        <div class="chart-content">
-                            <!-- Yuklanish indikatori -->
-                            <div class="chart-loader" id="applicationsChart-loader">
-                                <div class="spinner">
-                                    <div class="double-bounce1"></div>
-                                    <div class="double-bounce2"></div>
-                                </div>
-                                <span>Maʼlumotlar yuklanmoqda...</span> <!-- Tarjima qilindi -->
-                            </div>
-                            <div class="chart-container" id="chart-container">
-                                <canvas id="applicationsChart"></canvas>
-                            </div>
-                            <!-- Grafik xulosasi -->
-                            <div class="chart-summary" id="chart-summary">
-                                <div class="summary-item">
-                                    <span class="summary-label">Jami</span> <!-- Tarjima qilindi -->
-                                    <span class="summary-value" id="summary-total">--</span>
-                                </div>
-                                <div class="summary-item approved">
-                                    <span class="summary-label">Maʼqullangan</span> <!-- Tarjima qilindi -->
-                                    <span class="summary-value" id="summary-approved">--</span>
-                                </div>
-                                 <div class="summary-item pending">
-                                    <span class="summary-label">Jarayonda</span> <!-- Tarjima qilindi -->
-                                    <span class="summary-value" id="summary-pending">--</span>
-                                </div>
-                                <div class="summary-item rejected">
-                                    <span class="summary-label">Rad etilgan</span> <!-- Tarjima qilindi -->
-                                    <span class="summary-value" id="summary-rejected">--</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-
-            <!-- Footer -->
-            <footer class="main-footer">
-                 <!-- Tarjima qilingan footer -->
-                 🚀 "Shaffof Imkoniyat" Boshqaruv Paneli v1.1 | Halol kelajak uchun <i class="fa-solid fa-heart"></i> bilan yaratilgan | <a href="#">Loyihani qo'llab-quvvatlash</a>
-            </footer>
+<div class="main-content-wrapper">
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-left">
+            <button class="menu-toggle-btn" id="menu-toggle" title="Menyuni yig'ish/kengaytirish" aria-label="Menyu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
         </div>
-    </div>
+        <div class="header-right">
+            <button class="header-action-icon notifications-btn" title="Bildirishnomalar">
+                <i class="fa-regular fa-bell"></i>
+            </button>
+            <div class="profile-dropdown" title="Profil sozlamalari">
+                {# Use profile avatar if available #}
+                <span>{{ user.get_full_name|default:user.username }}</span>
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+        </div>
+    </header>
 
-    <!-- Bildirishnomalar uchun konteyner -->
-    <div class="notifications-container" id="notifications-container"></div>
+    <!-- Sahifa kontenti -->
+    <main class="page-content">
+        <h1 class="page-title">Boshqaruv Paneli</h1>
+        {# Display messages #}
+        {% if messages %}
+            <div class="messages-container" style="margin-bottom: 1.5rem;"> {# Added margin #}
+                {% for message in messages %}
+                {# Use Bootstrap alert classes if Bootstrap is loaded #}
+                <div class="alert alert-dismissible fade show {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
-    <!-- Skriptlar -->
-    <script src="{% static 'js/data.js' %}"></script> <!-- demoApplications, analyticsData, findApplicant, findScholarship shu yerda bo'lishi kerak -->
-    <script src="{% static 'js/script.js' %}"></script> <!-- Global skriptlar (menyu toggle, toast, KPI animatsiyasi) -->
-    <script src="{% static 'js/chart-config.js' %}"></script> <!-- Grafik konfiguratsiyalari -->
-    <!-- Ushbu sahifa uchun maxsus JS -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-             // Keraksiz console.log olib tashlandi
+        <div class="animate-on-load">
+            <!-- Statistika kartochkalari -->
+            <div class="stats-grid">
+                {# Card 1: Today's Submitted #}
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon-wrapper blue"><i class="fa-solid fa-file-circle-plus"></i></div>
+                        <div class="stat-card-title">Topshirilgan (Bugun)</div> {# Corrected title slightly #}
+                    </div>
+                    <div class="stat-card-value" data-target="{{ stats.today_submitted.value }}">{{ stats.today_submitted.value }}</div>
+                    <div class="stat-card-footer">
+                        {% if stats.today_submitted.change is not None %}
+                        <span class="stat-change {% if stats.today_submitted.change > 0 %}positive{% elif stats.today_submitted.change < 0 %}negative{% else %}neutral{% endif %}">
+                            <i class="fa-solid {% if stats.today_submitted.change > 0 %}fa-arrow-trend-up{% elif stats.today_submitted.change < 0 %}fa-arrow-trend-down{% else %}fa-minus{% endif %}"></i>
+                            {{ stats.today_submitted.change }}%
+                        </span>
+                        <span class="stat-period">kechagiga nisbatan</span>
+                        {% else %}
+                         <span class="stat-period">Kechagi ma'lumot yo'q</span>
+                        {% endif %}
+                    </div>
+                </div>
 
-            // --- FAQAT DASHBOARD SAHIFASI UCHUN KOD ---
-            const tableBody = document.querySelector('#applications-table tbody');
-            const placeholderRow = document.querySelector('#applications-table .table-placeholder');
-            const paginationWrapper = document.getElementById('table-pagination');
-            let currentPage = 1;
-            const rowsPerPage = 5; // Dashboardda kamroq qator ko'rsatish
-            let currentTableData = []; // Filtrlangan/saralangan ma'lumotlar
-            let currentSort = { column: 'date', direction: 'desc' }; // Standart saralash
+                {# Card 2: Approved This Month #}
+                <div class="stat-card">
+                     <div class="stat-card-header">
+                         <div class="stat-card-icon-wrapper green"><i class="fa-solid fa-thumbs-up"></i></div>
+                         <div class="stat-card-title">Ma'qullangan (oy davomida)</div>
+                     </div>
+                     <div class="stat-card-value" data-target="{{ stats.month_approved.value }}">{{ stats.month_approved.value }}</div>
+                     <div class="stat-card-footer">
+                          {% if stats.month_approved.change is not None %}
+                          <span class="stat-change {% if stats.month_approved.change > 0 %}positive{% elif stats.month_approved.change < 0 %}negative{% else %}neutral{% endif %}">
+                               <i class="fa-solid {% if stats.month_approved.change > 0 %}fa-arrow-trend-up{% elif stats.month_approved.change < 0 %}fa-arrow-trend-down{% else %}fa-minus{% endif %}"></i>
+                               {{ stats.month_approved.change }}%
+                          </span>
+                          <span class="stat-period">oʻtgan oyga nisbatan</span>
+                          {% else %}
+                          <span class="stat-period">O'tgan oy ma'lumoti yo'q</span>
+                          {% endif %}
+                     </div>
+                 </div>
 
-            // Holatlar uchun tarjima va klasslar/ikonkalar
-             const statusTranslations = {
-                 'Одобрена': 'Ma\'qullangan',
-                 'На рассмотрении': 'Ko\'rib chiqilmoqda',
-                 'Отклонена': 'Rad etilgan',
-                 'Подана': 'Yuborilgan',
-                 'Требует уточнения': 'Aniqlashtirish talab etiladi'
-             };
-             const statusClasses = {
-                 'Одобрена': 'status-approved',
-                 'На рассмотрении': 'status-pending',
-                 'Отклонена': 'status-rejected',
-                 'Подана': 'status-submitted',
-                 'Требует уточнения': 'status-clarification'
-             };
-             const statusIcons = {
-                 'Одобрена': 'fa-solid fa-check-circle',
-                 'На рассмотрении': 'fa-regular fa-clock',
-                 'Отклонена': 'fa-solid fa-times-circle',
-                 'Подана': 'fa-solid fa-paper-plane',
-                 'Требует уточнения': 'fa-solid fa-exclamation-circle'
-             };
+                 {# Card 3: Active Reviewing #}
+                 <div class="stat-card">
+                     <div class="stat-card-header">
+                         <div class="stat-card-icon-wrapper orange"><i class="fa-solid fa-user-clock"></i></div>
+                         <div class="stat-card-title">Faol koʻrib chiqilmoqda</div>
+                     </div>
+                      {# Use the specific count for reviewing status #}
+                     <div class="stat-card-value" data-target="{{ stats.active_reviewing.value }}">{{ stats.active_reviewing.value }}</div>
+                     <div class="stat-card-footer">
+                         {% if stats.active_reviewing.change is not None %}
+                         {# Note: Logic might be reversed (fewer reviewing might be better?) Adjust if needed #}
+                         <span class="stat-change {% if stats.active_reviewing.change < 0 %}positive{% elif stats.active_reviewing.change > 0 %}negative{% else %}neutral{% endif %}">
+                              <i class="fa-solid {% if stats.active_reviewing.change < 0 %}fa-arrow-trend-up{% elif stats.active_reviewing.change > 0 %}fa-arrow-trend-down{% else %}fa-minus{% endif %}"></i>
+                              {{ stats.active_reviewing.change }}%
+                         </span>
+                         <span class="stat-period">oʻtgan haftaga nisbatan</span>
+                         {% else %}
+                          <span class="stat-period">O'tgan hafta ma'lumoti yo'q</span> {# Show only if no change data #}
+                         {% endif %}
+                     </div>
+                 </div>
+
+                 {# Card 4: Needs Clarification #}
+                 <div class="stat-card">
+                     <div class="stat-card-header">
+                         <div class="stat-card-icon-wrapper red"><i class="fa-solid fa-circle-exclamation"></i></div> {# Changed icon back #}
+                         <div class="stat-card-title">Aniqlashtirish kutilmoqda</div> {# Changed title back #}
+                     </div>
+                      {# Use the specific count for clarification status #}
+                     <div class="stat-card-value" data-target="{{ stats.needs_attention.value }}">{{ stats.needs_attention.value }}</div>
+                     <div class="stat-card-footer">
+                          {% if stats.needs_attention.change is not None %}
+                           {# TODO: Implement change calculation logic in views.py if needed #}
+                           <span class="stat-change positive"><i class="fa-solid fa-arrow-trend-up"></i> {{ stats.needs_attention.change }}%</span> {# Placeholder for change #}
+                           <span class="stat-period">o'zgarish</span> {# Placeholder for period #}
+                          {% else %}
+                             <span class="stat-period">Hozirda mavjud</span> {# Show only if no change data #}
+                          {% endif %}
+                     </div>
+                 </div>
+            </div>
+
+            <!-- Charts and Totals Row -->
+            <div class="dashboard-row">
+                <!-- Ariza holatlari bo'yicha grafik -->
+                <div class="chart-wrapper card-table-wrapper">
+                    <h2 class="table-title">Arizalar Holati Bo'yicha Taqsimot</h2>
+                     <div class="chart-container">
+                        <div id="applicationsChart-loader" class="chart-loader">Yuklanmoqda...</div>
+                        <canvas id="applicationsChart"></canvas>
+                    </div>
+                </div>
+
+                 <!-- Umumiy Statistikalar -->
+                <div class="totals-wrapper card-table-wrapper">
+                    <h2 class="table-title">Umumiy Statistikalar</h2>
+                    <ul class="totals-list">
+                        <li>
+                            <i class="fa-solid fa-folder-open icon-blue"></i> {# Added color class #}
+                            <span>Jami Arizalar:</span>
+                            <strong>{{ total_applications }}</strong>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-check-circle icon-green"></i> {# Added color class #}
+                            <span>Ma'qullanganlar:</span>
+                            <strong>{{ total_approved }}</strong>
+                        </li>
+                        <li>
+                           <i class="fa-solid fa-hourglass-half icon-orange"></i> {# Added color class #}
+                            <span>Kutilayotganlar:</span>
+                            <strong>{{ total_pending }}</strong>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-times-circle icon-red"></i> {# Added color class #}
+                            <span>Rad Etilganlar:</span>
+                            <strong>{{ total_rejected }}</strong>
+                        </li>
+                    </ul>
+                     <p class="totals-note">Barcha vaqtlar uchun umumiy ko'rsatkichlar.</p>
+                </div>
+            </div>
 
 
-            // Jadval qatorlarini render qilish
-            function renderTableRows(data) {
-                tableBody.innerHTML = ''; // Jadvalni tozalash
-                 if (!data || data.length === 0) {
-                     // Agar ma'lumot bo'lmasa, xabar chiqarish (tarjima qilingan)
-                     tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px 0; color: var(--text-light);">Hech narsa topilmadi <i class="fa-regular fa-face-sad-tear"></i></td></tr>`;
-                     return;
-                 }
-                const startIndex = (currentPage - 1) * rowsPerPage;
-                const endIndex = startIndex + rowsPerPage;
-                const paginatedData = data.slice(startIndex, endIndex);
-
-                paginatedData.forEach((item, index) => {
-                    // Ariza beruvchi va stipendiyani topish (funksiyalar data.js da bo'lishi kerak)
-                    const applicant = typeof findApplicant === 'function' ? findApplicant(item.applicantId) : null;
-                    const scholarship = typeof findScholarship === 'function' ? findScholarship(item.scholarshipId) : null;
-                    if (!applicant || !scholarship) return; // Agar topilmasa, qatorni o'tkazib yuborish
-
-                    const row = document.createElement('tr');
-                    row.style.opacity = '0'; // Animatsiya uchun
-
-                    const translatedStatus = statusTranslations[item.status] || item.status; // Holatni tarjima qilish
-
-                    row.innerHTML = `
-                        <td>
-                            <div class="applicant-info">
-                                <img src="${applicant.avatar || 'https://i.pravatar.cc/30'}" alt="Avatar" class="applicant-avatar">
-                                <div>
-                                    <span class="applicant-name">${applicant.name}</span>
-                                    <span class="applicant-email">${applicant.email}</span>
+            <!-- So'nggi arizalar jadvali -->
+            <div class="card-table-wrapper">
+                <div class="table-header-controls">
+                    <h2 class="table-title">Soʻnggi Arizalar (Oxirgi 5 ta)</h2>
+                    <div class="table-filters">
+                        <div class="table-actions">
+                                <a href="{% url 'all_applications' %}" class="btn btn-outline-primary btn-sm">Barchasini koʻrish <i class="fa-solid fa-arrow-right"></i></a>
+                                <a href="{% url 'my_applications' %}" class="btn btn-outline-primary btn-sm">Mening arizalarim <i class="fa-solid fa-arrow-right"></i></a>
+                            </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="cool-table" id="applications-table">
+                        <thead>
+                        <tr>
+                            <th>Ariza beruvchi</th>
+                            <th>Stipendiya</th>
+                            <th>Yuborilgan sana</th>
+                            <th>Holati</th>
+                            <th>Amallar</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for app in recent_applications %}
+                        <tr>
+                            <td>
+                                <div class="applicant-info">
+                                    <div>
+                                        <span class="applicant-name">{{ app.applicant_full_name|default:app.applicant.get_full_name|default:app.applicant.username }}</span>
+                                        <span class="applicant-email">{{ app.applicant_email|default:app.applicant.email }}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td>${scholarship.name}</td>
-                        <td>${item.date}</td>
-                        <td>
-                            <span class="status-badge ${statusClasses[item.status] || 'status-clarification'}" title="Yangilangan: ${item.updateDate || '-'}"> <!-- Title tarjima qilindi -->
-                                <i class="${statusIcons[item.status] || 'fa-solid fa-question-circle'}"></i> ${translatedStatus}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <!-- Amallar tugmalari (ixtiyoriy) -->
-                                <button class="view-btn" title="Ko'rish"><i class="fa-solid fa-eye"></i></button> <!-- Tarjima qilindi -->
-                                <button class="edit-btn" title="Tahrirlash"><i class="fa-solid fa-pen"></i></button> <!-- Tarjima qilindi -->
-                                <!-- <button class="delete-btn" title="O'chirish"><i class="fa-solid fa-trash-can"></i></button> --> <!-- O'chirish tugmasi ehtiyotkorlik bilan ishlatiladi -->
-                            </div>
-                        </td>`;
-                    tableBody.appendChild(row);
-                    // Qator paydo bo'lish animatsiyasi
-                    setTimeout(() => {
-                        row.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-                        row.style.opacity = '1';
-                        row.style.transform = 'translateY(0)';
-                    }, 50 * index);
-                });
+                            </td>
+                            <td>{{ app.scholarship.name }}</td>
+                            <td>{{ app.submission_date|date:"Y-m-d H:i" }}</td>
+                            <td>
+                                <span class="status-badge status-{{ app.status }}">
+                                    <i class="fa-solid {% if app.status == 'approved' %}fa-check-circle{% elif app.status == 'rejected' %}fa-times-circle{% elif app.status == 'reviewing' %}fa-hourglass-half{% elif app.status == 'clarification' %}fa-triangle-exclamation{% elif app.status == 'submitted' %}fa-paper-plane{% else %}fa-question-circle{% endif %}"></i>
+                                    {{ app.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="view-btn action-btn" title="Ko'rish" data-app-id="{{ app.id }}" data-url="{% url 'application_details_api' app.id %}">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                    <button class="edit-btn action-btn" title="Statusni o'zgartirish" data-app-id="{{ app.id }}" data-current-status="{{ app.status }}" data-url="{% url 'application_change_status_api' app.id %}">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 20px;">Hozircha arizalar yoʻq.</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div> {# End animate-on-load #}
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        🚀 "Shaffof Imkoniyat" Boshqaruv Paneli v1.1 | Halol kelajak uchun <i class="fa-solid fa-heart red-heart"></i> bilan yaratilgan | <a href="{% url 'help_center' %}">Yordam Markazi</a>
+    </footer>
+</div>
+
+{# Application Details Modal (Keep as is) #}
+<div class="modal fade" id="applicationDetailsModal" tabindex="-1" aria-labelledby="applicationDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="applicationDetailsModalLabel">Ariza Tafsilotlari (#<span id="modal-app-id"></span>)</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Ariza beruvchi:</strong> <span id="modal-applicant-name"></span> (<span id="modal-applicant-email"></span>)</p>
+        <p><strong>Stipendiya:</strong> <span id="modal-scholarship-name"></span></p>
+        <p><strong>Yuborilgan sana:</strong> <span id="modal-submission-date"></span></p>
+        <p><strong>Oxirgi yangilanish:</strong> <span id="modal-last-updated"></span></p>
+        <p><strong>Holati:</strong> <span id="modal-status-badge"></span></p>
+        <hr>
+        <h6>Hujjatlar:</h6>
+        <ul id="modal-documents-list" style="list-style: none; padding-left: 0;"> {# Basic styling #}
+            {# Documents will be populated by JS #}
+        </ul>
+        <hr>
+        <h6>Admin Izohlari:</h6>
+        <pre id="modal-review-notes" style="white-space: pre-wrap; word-break: break-word; background-color: #f8f9fa; padding: 10px; border-radius: 4px;"></pre> {# Basic styling #}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Change Status Modal (Keep as is, but ensure status_choices is passed from view) #}
+<div class="modal fade" id="changeStatusModal" tabindex="-1" aria-labelledby="changeStatusModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="changeStatusModalLabel">Ariza Holatini O'zgartirish (#<span id="modal-status-app-id"></span>)</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="changeStatusForm">
+          {% csrf_token %}
+          <input type="hidden" id="modal-status-app-id-input" name="app_id">
+          <div class="modal-body">
+              <div class="mb-3">
+                <label for="new_status" class="form-label">Yangi Holat:</label>
+                <select class="form-select" id="new_status" name="status" required>
+                    {# Ensure 'status_choices' is in context from views.py dashboard function #}
+                    {% for value, display in status_choices %}
+                       <option value="{{ value }}">{{ display }}</option>
+                    {% endfor %}
+                </select>
+              </div>
+              <div class="mb-3">
+                  <label for="review_notes" class="form-label">Izoh (Ixtiyoriy):</label>
+                  <textarea class="form-control" id="review_notes" name="notes" rows="3"></textarea>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+            <button type="submit" class="btn btn-primary">Saqlash</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block extra_scripts %}
+{# Ensure Chart.js is loaded in base.html #}
+<script>
+    // --- Helper function for CSRF token (needed for AJAX POST) ---
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
             }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
 
-            // Sahifalashni render qilish
-            function renderPagination(totalRows) {
-                 if (!paginationWrapper) return;
-                 paginationWrapper.innerHTML = ''; // Eski sahifalashni tozalash
-                 const totalPages = Math.ceil(totalRows / rowsPerPage);
-                 if (totalPages <= 1) return; // Agar bitta sahifa bo'lsa, ko'rsatmaslik
+    // --- Chart Initialization ---
+    function initApplicationsStatusChart(ctx, chartConfig) {
+        const statusColors = { // Using keys directly matching Application.STATUS_CHOICES display values
+            'Yuborilgan': 'rgba(54, 162, 235, 0.7)',   // Submitted (Blue)
+            'Ko\'rib chiqilmoqda': 'rgba(255, 159, 64, 0.7)', // Reviewing (Orange)
+            'Aniqlashtirilmoqda': 'rgba(255, 205, 86, 0.7)', // Clarification (Yellow)
+            'Ma\'qullangan': 'rgba(75, 192, 192, 0.7)',   // Approved (Green)
+            'Rad etilgan': 'rgba(255, 99, 132, 0.7)',    // Rejected (Red)
+            // Add default for safety
+            'default': 'rgba(201, 203, 207, 0.7)' // Gray
+        };
+         // Map labels to colors, handle potential missing labels
+        const backgroundColors = chartConfig.labels.map(label => statusColors[label] || statusColors['default']);
+        const borderColors = backgroundColors.map(color => color.replace('0.7', '1'));
 
-                 const startRow = (currentPage - 1) * rowsPerPage + 1;
-                 const endRow = Math.min(currentPage * rowsPerPage, totalRows);
-
-                 // Ma'lumot (tarjima qilingan)
-                 const infoSpan = document.createElement('span');
-                 infoSpan.classList.add('pagination-info');
-                 infoSpan.textContent = `${totalRows} ta arizadan ${startRow}-${endRow} koʻrsatilmoqda`;
-                 paginationWrapper.appendChild(infoSpan);
-
-                 const controlsDiv = document.createElement('div');
-                 controlsDiv.classList.add('pagination-controls');
-
-                 // Orqaga tugmasi (tarjima qilingan)
-                 const prevButton = document.createElement('button');
-                 prevButton.classList.add('btn', 'btn-secondary', 'btn-sm');
-                 prevButton.innerHTML = '« Orqaga';
-                 prevButton.disabled = currentPage === 1;
-                 prevButton.addEventListener('click', () => {
-                     if (currentPage > 1) {
-                         currentPage--;
-                         renderTableRows(currentTableData);
-                         renderPagination(totalRows);
-                     }
-                 });
-                 controlsDiv.appendChild(prevButton);
-
-                 // Oldinga tugmasi (tarjima qilingan)
-                 const nextButton = document.createElement('button');
-                 nextButton.classList.add('btn', 'btn-secondary', 'btn-sm');
-                 nextButton.innerHTML = 'Oldinga »';
-                 nextButton.disabled = currentPage === totalPages;
-                 nextButton.addEventListener('click', () => {
-                     if (currentPage < totalPages) {
-                         currentPage++;
-                         renderTableRows(currentTableData);
-                         renderPagination(totalRows);
-                     }
-                 });
-                 controlsDiv.appendChild(nextButton);
-
-                 paginationWrapper.appendChild(controlsDiv);
-            }
-
-            // Ma'lumotlarni saralash
-            function sortData(data, column, direction) {
-                // Saralash logikasi (oldingi javobdan olingan)
-                return [...data].sort((a, b) => {
-                    let valA, valB;
-                    const applicantA = typeof findApplicant === 'function' ? findApplicant(a.applicantId) : null;
-                    const applicantB = typeof findApplicant === 'function' ? findApplicant(b.applicantId) : null;
-                    const scholarshipA = typeof findScholarship === 'function' ? findScholarship(a.scholarshipId) : null;
-                    const scholarshipB = typeof findScholarship === 'function' ? findScholarship(b.scholarshipId) : null;
-
-                    switch(column) {
-                        case 'applicant': valA = applicantA ? applicantA.name.toLowerCase() : ''; valB = applicantB ? applicantB.name.toLowerCase() : ''; break;
-                        case 'scholarship': valA = scholarshipA ? scholarshipA.name.toLowerCase() : ''; valB = scholarshipB ? scholarshipB.name.toLowerCase() : ''; break;
-                        case 'date':
-                            try { valA = new Date(a.date); valB = new Date(b.date); if(isNaN(valA)) valA = new Date(0); if(isNaN(valB)) valB = new Date(0); } catch(e){valA=0; valB=0;} break;
-                        case 'status': valA = a.status.toLowerCase(); valB = b.status.toLowerCase(); break;
-                        default: try { valA = new Date(a.date); valB = new Date(b.date); if(isNaN(valA)) valA = new Date(0); if(isNaN(valB)) valB = new Date(0); } catch(e){valA=0; valB=0;} // Standart sana bo'yicha
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: chartConfig.labels,
+                datasets: [{
+                    label: 'Arizalar Holati',
+                    data: chartConfig.data,
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom', // Better position for doughnut
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    // Calculate percentage
+                                    const total = context.dataset.data.reduce((acc, value) => acc + value, 0);
+                                    const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) + '%' : '0%';
+                                    label += `${context.parsed} (${percentage})`;
+                                }
+                                return label;
+                            }
+                        }
                     }
-                    if (valA < valB) return direction === 'asc' ? -1 : 1;
-                    if (valA > valB) return direction === 'asc' ? 1 : -1;
-                    return 0;
-                 });
+                }
             }
-
-            // Saralash sarlavhalarini yangilash
-            function updateSortHeaders() {
-                tableHeaders.forEach(h => {
-                    h.classList.remove('sort-asc', 'sort-desc'); // Eski klasslarni olib tashlash
-                    if (h.getAttribute('data-sort') === currentSort.column) {
-                        h.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc'); // Joriy klassni qo'shish
-                    }
-                });
-            }
-
-            // Jadvalni initsializatsiya qilish
-            function initTable() {
-                // Keraksiz console.log olib tashlandi
-                if(placeholderRow) placeholderRow.style.display = 'none'; // Yuklanish indikatorini yashirish
-                 // demoApplications data.js da mavjud deb faraz qilinadi
-                 if (typeof demoApplications !== 'undefined') {
-                    currentTableData = sortData(demoApplications, currentSort.column, currentSort.direction);
-                    renderTableRows(currentTableData);
-                    renderPagination(currentTableData.length);
-                    updateSortHeaders(); // Boshlang'ich saralash indikatorlarini o'rnatish
-                    // Keraksiz console.log olib tashlandi
-                 } else {
-                     console.error("Ariza ma'lumotlari (demoApplications) topilmadi!");
-                     tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px 0; color: var(--accent-red);">Maʼlumotlarni yuklashda xatolik yuz berdi.</td></tr>`; // Tarjima qilindi
-                 }
-            }
-
-            // Jadvalni kechikish bilan boshlash
-            setTimeout(initTable, 500); // Kichik kechikish interfeys bloklanishini oldini oladi
-
-            // Qidiruv inputiga event listener qo'shish
-            const searchInput = document.getElementById('table-search-input');
-            if (searchInput && typeof demoApplications !== 'undefined') {
-                searchInput.addEventListener('input', (e) => {
-                    const searchTerm = e.target.value.toLowerCase().trim();
-                    currentPage = 1; // Qidiruvda birinchi sahifaga qaytish
-                    // Filtrlash logikasi
-                    const filteredData = demoApplications.filter(item => {
-                        const applicant = typeof findApplicant === 'function' ? findApplicant(item.applicantId) : null;
-                        const scholarship = typeof findScholarship === 'function' ? findScholarship(item.scholarshipId) : null;
-                        const translatedStatus = statusTranslations[item.status] || item.status;
-
-                        return (
-                            (applicant && applicant.name.toLowerCase().includes(searchTerm)) ||
-                            (applicant && applicant.email.toLowerCase().includes(searchTerm)) ||
-                            (scholarship && scholarship.name.toLowerCase().includes(searchTerm)) ||
-                            item.status.toLowerCase().includes(searchTerm) || // Original status bo'yicha qidirish
-                            translatedStatus.toLowerCase().includes(searchTerm) || // Tarjima qilingan status bo'yicha qidirish
-                            item.date.includes(searchTerm)
-                        );
-                    });
-                    currentTableData = sortData(filteredData, currentSort.column, currentSort.direction); // Filtrlangan ma'lumotlarni saralash
-                    renderTableRows(currentTableData); // Jadvalni qayta chizish
-                    renderPagination(currentTableData.length); // Sahifalashni yangilash
-                    // Keraksiz console.log olib tashlandi
-                });
-            }
-
-            // Jadval sarlavhalariga saralash uchun event listener'lar
-             const tableHeaders = document.querySelectorAll('#applications-table th[data-sort]');
-             tableHeaders.forEach(header => {
-                 header.addEventListener('click', () => {
-                     const sortColumn = header.getAttribute('data-sort');
-                     let sortDirection = 'asc'; // Standart yo'nalish
-                     if (currentSort.column === sortColumn) {
-                         sortDirection = currentSort.direction === 'asc' ? 'desc' : 'asc'; // Yo'nalishni almashtirish
-                     }
-                     // Keraksiz console.log olib tashlandi
-                     currentSort = { column: sortColumn, direction: sortDirection }; // Joriy saralashni yangilash
-                     currentPage = 1; // Birinchi sahifaga qaytish
-                     // currentTableData (filtrlangan bo'lishi mumkin) yoki barcha ma'lumotlarni saralash
-                     // Qidiruv faol bo'lsa, currentTableData ni, aks holda all data ni saralash kerak
-                     const dataToSort = searchInput.value.trim() ? currentTableData : (typeof demoApplications !== 'undefined' ? demoApplications : []);
-                     currentTableData = sortData(dataToSort, currentSort.column, currentSort.direction); // Saralash
-                     renderTableRows(currentTableData); // Jadvalni qayta chizish
-                     renderPagination(currentTableData.length); // Sahifalashni yangilash
-                     updateSortHeaders(); // Saralash indikatorlarini yangilash
-                 });
-             });
-
-            // Grafikni initsializatsiya qilish (funksiya chart-config.js da)
-             // analyticsData data.js da mavjud deb faraz qilinadi
-             if (typeof initApplicationsStatusChart === 'function' && typeof analyticsData !== 'undefined') {
-                initApplicationsStatusChart('applicationsChart', analyticsData.applicationsByStatus);
-                 // Grafik xulosasini to'ldirish
-                 const summary = analyticsData.applicationsByStatus.data;
-                 document.getElementById('summary-total').textContent = summary.reduce((a, b) => a + b, 0);
-                 document.getElementById('summary-approved').textContent = summary[0]; // Ma'qullangan
-                 document.getElementById('summary-pending').textContent = summary[1] + summary[4]; // Jarayonda + Aniqlashtirish
-                 document.getElementById('summary-rejected').textContent = summary[2]; // Rad etilgan
-             } else {
-                 console.error("Grafikni yaratish uchun funksiya yoki ma'lumotlar topilmadi!");
-                  const chartLoader = document.getElementById('applicationsChart-loader');
-                  if(chartLoader) chartLoader.innerHTML = '<span style="color: var(--accent-red);">Grafikni yuklashda xatolik.</span>'; // Tarjima qilindi
-             }
-
-
-            // Chiqish tugmasi
-            const logoutBtn = document.getElementById('logout-btn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if(typeof showToast === 'function') showToast('Siz tizimdan muvaffaqiyatli chiqdingiz.', 'Chiqish', 'info'); // Tarjima qilindi
-                    // Haqiqiy chiqish logikasi:
-                    // window.location.href = '/login.html';
-                });
-            }
-
-            // Bildirishnoma belgisini ko'rsatish (misol)
-            const notificationBadge = document.querySelector('.notification-badge');
-            if (notificationBadge && typeof analyticsData !== 'undefined' && analyticsData.applicationsByStatus.data.length > 4 && analyticsData.applicationsByStatus.data[4] > 0) { // Agar "Aniqlashtirish talab etiladi" arizalari bo'lsa
-                notificationBadge.style.display = 'block';
-                notificationBadge.textContent = analyticsData.applicationsByStatus.data[4]; // Sonini ko'rsatish
-                // CSS orqali stillarni sozlash yaxshiroq, lekin JS da ham mumkin:
-                notificationBadge.style.width = 'auto';
-                notificationBadge.style.height = 'auto';
-                notificationBadge.style.padding = '2px 5px';
-                notificationBadge.style.fontSize = '0.7rem';
-            }
-
-            // Yon panel va headerdagi foydalanuvchi ma'lumotlarini yuklash
-            const currentUserId = 9; // Demo user ID
-            const currentUser = typeof findApplicant === 'function' ? findApplicant(currentUserId) : null;
-            const sidebarAvatar = document.getElementById('sidebar-avatar');
-            const sidebarUserName = document.getElementById('sidebar-user-name');
-            const sidebarUserRole = document.getElementById('sidebar-user-role');
-            const headerAvatar = document.getElementById('header-avatar');
-            const roleTranslations = { 'Супер Админ': 'Super Admin', 'Администратор': 'Administrator', 'Ревьюер': 'Tekshiruvchi', 'Заявитель': 'Ariza beruvchi' }; // Rollarni tarjima qilish
-
-            if (currentUser) {
-                 if (sidebarAvatar) sidebarAvatar.src = currentUser.avatar || `https://ui-avatars.com/api/?name=${currentUser?.name?.split(' ').map(n=>n[0]).join('') || '??'}&background=random&size=40`;
-                 if (headerAvatar) headerAvatar.src = currentUser.avatar || `https://ui-avatars.com/api/?name=${currentUser?.name?.split(' ').map(n=>n[0]).join('') || '??'}&background=random&size=40`;
-                 if (sidebarUserName) sidebarUserName.textContent = currentUser.name || 'Foydalanuvchi';
-                 const translatedRole = roleTranslations[currentUser.role] || currentUser.role;
-                 if (sidebarUserRole) sidebarUserRole.textContent = translatedRole;
-            }
-
         });
-    </script>
+        document.getElementById('applicationsChart-loader')?.remove();
+    }
+
+    // --- Animate Stat Card Values ---
+    function animateValue(element, start, end, duration) {
+        if (!element || isNaN(end)) { // Check if end is a valid number
+             if(element) element.textContent = element.textContent || '0'; // Display current text or 0 if invalid
+             return;
+         }
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            element.textContent = Math.floor(progress * (end - start) + start).toLocaleString('uz-UZ'); // Use locale for formatting if needed
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            } else {
+                 element.textContent = end.toLocaleString('uz-UZ'); // Ensure final value is exact
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // --- DOMContentLoaded Event Listener ---
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Chart
+        const ctx = document.getElementById('applicationsChart')?.getContext('2d');
+        const loader = document.getElementById('applicationsChart-loader');
+        const chartContainer = ctx?.canvas.parentNode;
+
+        if (ctx && loader && chartContainer) {
+            try {
+                const chartLabels = JSON.parse('{{ chart_labels|escapejs|default:"[]" }}');
+                const chartData = JSON.parse('{{ chart_data|escapejs|default:"[]" }}');
+
+                // Check if there is actual data to display
+                const hasData = chartData.some(value => value > 0);
+
+                if (chartLabels && chartData && chartLabels.length > 0 && hasData) {
+                     initApplicationsStatusChart(ctx, { labels: chartLabels, data: chartData });
+                } else {
+                     loader.remove();
+                     chartContainer.innerHTML = '<p style="text-align:center; padding: 40px 20px; color: #6c757d;">Grafik uchun ma\'lumot yo\'q.</p>';
+                }
+            } catch (e) {
+                console.error("Error processing chart data:", e);
+                loader.remove();
+                chartContainer.innerHTML = '<p style="text-align:center; padding: 40px 20px; color: #dc3545;">Grafikni yuklashda xatolik yuz berdi.</p>';
+            }
+        } else if(loader) {
+             loader.remove(); // Remove loader if canvas/context not found
+             if(chartContainer) chartContainer.innerHTML = '<p style="text-align:center; padding: 40px 20px; color: #6c757d;">Grafik elementi topilmadi.</p>';
+        }
+
+        // Animate KPI values
+        document.querySelectorAll('.stat-card-value[data-target]').forEach(el => {
+             const targetValue = parseInt(el.dataset.target);
+             animateValue(el, 0, targetValue, 1500);
+        });
+
+        // --- Modal Handling ---
+        const detailsModalElement = document.getElementById('applicationDetailsModal');
+        const statusModalElement = document.getElementById('changeStatusModal');
+        const detailsModal = detailsModalElement ? new bootstrap.Modal(detailsModalElement) : null;
+        const statusModal = statusModalElement ? new bootstrap.Modal(statusModalElement) : null;
+
+        // View Button Click
+        document.querySelectorAll('.view-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                if (!detailsModal) return; // Don't proceed if modal doesn't exist
+                const url = this.dataset.url;
+                // Show loading state in modal maybe?
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) throw new Error(`Server xatosi: ${response.status}`);
+                        return response.json();
+                     })
+                    .then(data => {
+                        // Populate Modal - Safely access data
+                        document.getElementById('modal-app-id').textContent = data.id || 'N/A';
+                        document.getElementById('modal-applicant-name').textContent = data.applicant_name || 'N/A';
+                        document.getElementById('modal-applicant-email').textContent = data.applicant_email || 'N/A';
+                        document.getElementById('modal-scholarship-name').textContent = data.scholarship_name || 'N/A';
+                        document.getElementById('modal-submission-date').textContent = data.submission_date || 'N/A';
+                        document.getElementById('modal-last-updated').textContent = data.last_updated || 'N/A';
+                        document.getElementById('modal-status-badge').innerHTML = data.status_badge_html || `<span class="status-badge status-unknown">${data.status_display || 'Noma\'lum'}</span>`;
+                        document.getElementById('modal-review-notes').textContent = data.review_notes || 'Izohlar yo\'q.';
+
+                        const docsList = document.getElementById('modal-documents-list');
+                        docsList.innerHTML = ''; // Clear previous docs
+                        if (data.documents && data.documents.length > 0) {
+                            data.documents.forEach(doc => {
+                                const li = document.createElement('li');
+                                const a = document.createElement('a');
+                                a.href = doc.url || '#';
+                                a.textContent = `${doc.type_display || 'Hujjat'}: ${doc.filename || 'fayl'}`;
+                                a.target = '_blank';
+                                a.rel = 'noopener noreferrer'; // Security best practice
+                                const icon = document.createElement('i');
+                                icon.className = 'fa-solid fa-file-arrow-down ms-2'; // Add download icon
+                                a.appendChild(icon);
+                                li.appendChild(a);
+                                docsList.appendChild(li);
+                            });
+                        } else {
+                            docsList.innerHTML = '<li>Hujjatlar yuklanmagan.</li>';
+                        }
+                        detailsModal.show();
+                    })
+                    .catch(error => {
+                        console.error('Error fetching application details:', error);
+                        // Consider using a more user-friendly notification system
+                        alert(`Ariza ma'lumotlarini olishda xatolik: ${error.message}`);
+                    });
+            });
+        });
+
+        // Edit/Change Status Button Click
+        document.querySelectorAll('.edit-btn').forEach(button => {
+             button.addEventListener('click', function() {
+                if (!statusModal) return;
+                const appId = this.dataset.appId;
+                const currentStatus = this.dataset.currentStatus;
+                document.getElementById('modal-status-app-id').textContent = appId;
+                document.getElementById('modal-status-app-id-input').value = appId;
+                document.getElementById('new_status').value = currentStatus;
+                document.getElementById('review_notes').value = '';
+                statusModal.show();
+            });
+        });
+
+        // Change Status Form Submission
+        const changeStatusForm = document.getElementById('changeStatusForm');
+        if (changeStatusForm && statusModal) {
+            changeStatusForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const appId = document.getElementById('modal-status-app-id-input').value;
+                 // Construct the URL robustly (ensure your URL name is correct)
+                const url = "{% url 'application_change_status_api' pk=0 %}".replace('0', appId);
+                const submitButton = changeStatusForm.querySelector('button[type="submit"]');
+                const originalButtonText = submitButton.innerHTML;
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saqlanmoqda...';
+
+
+                const formData = {
+                    status: document.getElementById('new_status').value,
+                    notes: document.getElementById('review_notes').value
+                };
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json().then(data => ({ status: response.status, body: data }))) // Process JSON regardless of status
+                .then(({ status, body }) => {
+                     if (status >= 200 && status < 300 && body.success) {
+                        statusModal.hide();
+                        // Update table row
+                        const row = document.querySelector(`button[data-app-id="${appId}"]`)?.closest('tr');
+                        if (row) {
+                           const statusCell = row.querySelector('td:nth-child(4) span.status-badge');
+                           const editBtn = row.querySelector(`.edit-btn[data-app-id="${appId}"]`);
+                           if (statusCell) {
+                                statusCell.className = `status-badge status-${body.new_status}`;
+                                statusCell.innerHTML = body.status_badge_html || `<i class="fa-solid ..."></i> ${body.new_status_display}`; // Update dynamic icon later if needed
+                           }
+                           if(editBtn) editBtn.dataset.currentStatus = body.new_status;
+                        }
+                         // Show success message (replace alert later)
+                         alert('Status muvaffaqiyatli o\'zgartirildi!');
+                         // Force redraw totals if needed (more complex)
+                         // window.location.reload(); // Simple solution, but less smooth UX
+                    } else {
+                        // Handle failure, show error message from response body if available
+                        const errorMessage = body.error || (status === 403 ? "Ruxsat yo'q" : 'Noma\'lum xatolik yuz berdi.');
+                        alert(`Xatolik (${status}): ${errorMessage}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error changing status:', error);
+                    alert('Statusni o\'zgartirishda server bilan bog\'lanishda xatolik yuz berdi.');
+                })
+                .finally(() => {
+                    // Re-enable button and restore text
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalButtonText;
+                 });
+            });
+        }
+
+    }); // End DOMContentLoaded
+</script>
 
 
 {% endblock %}

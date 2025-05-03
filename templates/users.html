@@ -1,585 +1,387 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block extra_head %}
+<style>
+    /* Modal oyna uchun stillar */
+    .modal { display: none; position: fixed; z-index: 1055; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px); animation: fadeIn 0.3s ease; }
+    .modal.active { display: flex; align-items: center; justify-content: center; }
+    .modal-content { background-color: var(--bg-card); margin: auto; padding: 30px 40px; border: 1px solid var(--border-color); width: 90%; max-width: 600px; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-xl); position: relative; animation: slideUpModal 0.4s ease forwards; opacity: 0; transform: translateY(20px); }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUpModal { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .modal-close { color: var(--text-light); position: absolute; top: 15px; right: 20px; font-size: 1.8rem; font-weight: bold; cursor: pointer; transition: color 0.2s ease, transform 0.2s ease; }
+    .modal-close:hover { color: var(--accent-red); transform: rotate(90deg); }
+    .modal-header h2 { font-size: 1.6rem; margin-bottom: 20px; color: var(--text-dark); }
+    .modal-body { max-height: 65vh; overflow-y: auto; padding-right: 15px; margin-right: -15px; } /* Scroll uchun */
+    .modal-footer { margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 10px; }
+    .error-message { color: var(--accent-red); font-size: 0.8rem; margin-top: 4px; display: block; }
+    .form-group.has-error input, .form-group.has-error select, .form-group.has-error textarea { border-color: var(--accent-red) !important; }
+</style>
+{% endblock %}
+
+
 {% block content %}
-    <!-- Chart.js qoldirildi -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <style> /* Modal oyna uchun stillar qoldirildi */
-        .modal { display: none; position: fixed; z-index: 1055; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px); animation: fadeIn 0.3s ease; }
-        .modal.active { display: flex; align-items: center; justify-content: center; }
-        .modal-content { background-color: var(--bg-card); margin: auto; padding: 30px 40px; border: 1px solid var(--border-color); width: 90%; max-width: 600px; border-radius: var(--border-radius-xl); box-shadow: var(--shadow-xl); position: relative; animation: slideUpModal 0.4s var(--transition-ease) forwards; opacity: 0; transform: translateY(20px); }
-        .modal-close { color: var(--text-light); position: absolute; top: 15px; right: 20px; font-size: 1.8rem; font-weight: bold; cursor: pointer; transition: color 0.2s ease, transform 0.2s ease; }
-        .modal-close:hover { color: var(--accent-red); transform: rotate(90deg); }
-        .modal-header h2 { font-size: 1.6rem; margin-bottom: 20px; color: var(--text-dark); }
-        .modal-body { max-height: 65vh; overflow-y: auto; padding-right: 15px; margin-right: -15px; }
-        .modal-footer { margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 10px; }
-    </style>
-
-
-        <!-- Asosiy kontent uchun o'ram -->
-        <div class="main-content-wrapper">
-            <!-- Header (minimal, keraksiz qismlar olib tashlangan) -->
-             <header class="main-header">
-                 <div class="header-left">
-                    <button class="menu-toggle-btn" id="menu-toggle" title="Menyuni yig'ish/kengaytirish" aria-label="Menyu"> <!-- Tarjima qilindi -->
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-                </div>
-                <div class="header-right">
-                    <!-- Headerning o'ng qismi (minimal) -->
-                    <div class="profile-dropdown" title="Profil sozlamalari"> <img src="https://i.pravatar.cc/40?img=4" alt="Avatar" class="profile-avatar"> </div> <!-- Tarjima qilindi -->
-                </div>
-            </header>
-
-            <!-- Sahifa kontenti -->
-            <main class="page-content">
-                <h1 class="page-title">Foydalanuvchilarni Boshqarish</h1> <!-- Tarjima qilindi -->
-                 <div class="animate-on-load">
-                     <div class="card-table-wrapper">
-                        <div class="table-header-controls">
-                            <h2 class="table-title">Foydalanuvchilar Roʻyxati</h2> <!-- Tarjima qilindi -->
-                            <div class="table-filters">
-                                <div class="table-search">
-                                    <i class="fa-solid fa-magnifying-glass"></i>
-                                    <input type="text" id="users-search-input" placeholder="Ism, email, rol boʻyicha qidirish..." aria-label="Foydalanuvchilar boʻyicha qidirish"> <!-- Tarjima qilindi -->
-                                </div>
-                                <div class="table-actions">
-                                     <select id="users-role-filter" class="btn btn-secondary btn-sm" style="height: 38px;" aria-label="Rol boʻyicha filtr"> <!-- Tarjima qilindi -->
-                                         <option value="">Barcha rollar</option> <!-- Tarjima qilindi -->
-                                         <!-- Qiymatlar data.js bilan moslik uchun rus tilida qoladi -->
-                                         <option value="Заявитель">Ariza beruvchi</option> <!-- Tarjima qilindi -->
-                                         <option value="Администратор">Administrator</option> <!-- Tarjima qilindi -->
-                                         <option value="Супер Админ">Super Admin</option> <!-- Tarjima qilindi -->
-                                         <option value="Ревьюер">Tekshiruvchi</option> <!-- Tarjima qilindi -->
-                                     </select>
-                                      <select id="users-status-filter" class="btn btn-secondary btn-sm" style="height: 38px;" aria-label="Holat boʻyicha filtr"> <!-- Tarjima qilindi -->
-                                         <option value="">Barcha holatlar</option> <!-- Tarjima qilindi -->
-                                         <!-- Qiymatlar data.js bilan moslik uchun rus tilida qoladi -->
-                                         <option value="Активен">Faollar</option> <!-- Tarjima qilindi -->
-                                         <option value="Неактивен">Faol emaslar</option> <!-- Tarjima qilindi -->
-                                     </select>
-                                    <button class="btn btn-primary btn-sm" id="add-user-btn"><i class="fa-solid fa-user-plus"></i> Foydalanuvchi Qoʻshish</button> <!-- Tarjima qilindi -->
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="cool-table" id="users-table">
-                                <thead>
-                                    <tr>
-                                        <!-- Saralash ikonkalari qoldirildi -->
-                                        <th data-sort="name">Foydalanuvchi <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
-                                        <th data-sort="role">Roli <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
-                                        <th data-sort="registered">Roʻyxatdan oʻtgan sana <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
-                                        <th>Arizalar soni</th> <!-- Tarjima qilindi -->
-                                        <th data-sort="status">Holati <i class="fa-solid fa-sort"></i><i class="fa-solid fa-sort-up"></i><i class="fa-solid fa-sort-down"></i></th> <!-- Tarjima qilindi -->
-                                        <th>Amallar</th> <!-- Tarjima qilindi -->
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Yuklanish indikatori (JS tomonidan boshqariladi) -->
-                                    <tr class="table-placeholder">
-                                         <td colspan="6" style="text-align: center; padding: 50px 0; color: var(--text-light);">
-                                             <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                                             <p>Foydalanuvchilar yuklanmoqda...</p> <!-- Tarjima qilindi -->
-                                         </td>
-                                     </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="pagination-wrapper" id="users-pagination">
-                            <!-- Sahifalash JS orqali render qilinadi -->
-                        </div>
-                    </div>
-                </div>
-            </main>
-
-            <!-- Footer -->
-            <footer class="main-footer">
-                <!-- Tarjima qilingan footer -->
-                🚀 "Shaffof Imkoniyat" Boshqaruv Paneli v1.1 | Halol kelajak uchun <i class="fa-solid fa-heart"></i> bilan yaratilgan | <a href="#">Loyihani qo'llab-quvvatlash</a>
-            </footer>
-        </div>
-    </div>
-
-    <!-- Foydalanuvchi qo'shish/tahrirlash uchun Modal Oyna -->
-    <div id="user-modal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close" id="user-modal-close-btn">×</span>
-            <div class="modal-header">
-                <h2 id="user-modal-title">Yangi foydalanuvchi qoʻshish</h2> <!-- Tarjima qilindi (dinamik o'zgaradi) -->
+<div class="main-content-wrapper">
+    <!-- Header -->
+     <header class="main-header">
+        <div class="header-left">
+           <button class="menu-toggle-btn" id="menu-toggle" title="Menyuni yig'ish/kengaytirish" aria-label="Menyu">
+               <i class="fa-solid fa-bars"></i>
+           </button>
+       </div>
+       <div class="header-right">
+            <div class="profile-dropdown" title="Profil sozlamalari">
             </div>
+       </div>
+   </header>
+
+    <!-- Sahifa kontenti -->
+    <main class="page-content">
+        <h1 class="page-title">Foydalanuvchilarni Boshqarish</h1>
+         <div class="animate-on-load">
+             <div class="card-table-wrapper">
+                <div class="table-header-controls">
+                    <h2 class="table-title">Foydalanuvchilar Roʻyxati</h2>
+                    <form method="get" class="table-filters">
+                        <div class="table-search">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" name="search" id="users-search-input" placeholder="Ism, email, rol boʻyicha qidirish..." value="{{ request.GET.search|default:'' }}">
+                        </div>
+                        <div class="table-actions">
+                             <select name="role_filter" id="users-role-filter" class="btn btn-secondary btn-sm" style="height: 38px;">
+                                 <option value="">Barcha rollar</option>
+                                 {% for value, display in role_choices %}
+                                 <option value="{{ value }}" {% if request.GET.role_filter == value %}selected{% endif %}>{{ display }}</option>
+                                 {% endfor %}
+                             </select>
+                              <select name="status_filter" id="users-status-filter" class="btn btn-secondary btn-sm" style="height: 38px;">
+                                 <option value="">Barcha holatlar</option>
+                                 {% for value, display in status_choices_filter %}
+                                 <option value="{{ value }}" {% if request.GET.status_filter == value %}selected{% endif %}>{{ display }}</option>
+                                 {% endfor %}
+                             </select>
+                             <button type="submit" class="btn btn-light btn-sm"><i class="fa-solid fa-filter"></i> Filtr</button>
+                             <a href="{% url 'users' %}" class="btn btn-secondary btn-sm"><i class="fa-solid fa-times"></i> Tozalash</a>
+                            <button type="button" class="btn btn-primary btn-sm" id="add-user-btn"><i class="fa-solid fa-user-plus"></i> Foydalanuvchi Qoʻshish</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive">
+                    <table class="cool-table" id="users-table">
+                        <thead>
+                            <tr>
+                                <th>Foydalanuvchi</th>
+                                <th>Roli</th>
+                                <th>Roʻyxatdan oʻtgan sana</th>
+                                <th>Arizalar soni</th>
+                                <th>Holati</th>
+                                <th>Amallar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u_data in users_page %} {# Viewdan 'users_page' keladi #}
+                            <tr id="user-row-{{ u_data.user.id }}">
+                                <td>
+                                    <div class="applicant-info">
+                                        <div>
+                                            <span class="applicant-name">{{ u_data.user.get_full_name|default:u_data.user.username }}</span>
+                                            <span class="applicant-email">{{ u_data.user.email }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ u_data.role_display }}</td>
+                                <td>{{ u_data.user.date_joined|date:"Y-m-d"|default:"-" }}</td>
+                                <td>{{ u_data.app_count }}</td>
+                                <td id="status-cell-{{ u_data.user.id }}">
+                                    <span class="status-badge {% if u_data.user.is_active %}status-approved{% else %}status-rejected{% endif %}">
+                                        <i class="fa-solid {% if u_data.user.is_active %}fa-circle-check{% else %}fa-circle-xmark{% endif %}"></i>
+                                        {{ u_data.status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                         <button class="edit-btn" title="Tahrirlash" data-userid="{{ u_data.user.id }}"><i class="fa-solid fa-user-pen"></i></button>
+                                         <button class="toggle-status-btn"
+                                                 title="{% if u_data.user.is_active %}Faolsizlantirish{% else %}Faollashtirish{% endif %}"
+                                                 data-userid="{{ u_data.user.id }}"
+                                                 data-url="{% url 'user_toggle_status' u_data.user.id %}"
+                                                 data-csrf="{{ csrf_token }}">
+                                             <i class="fa-solid {% if u_data.user.is_active %}fa-user-slash{% else %}fa-user-check{% endif %}"></i>
+                                         </button>
+                                    </div>
+                                </td>
+                            </tr>
+                           {% empty %}
+                               <tr>
+                                   <td colspan="6" style="text-align: center; padding: 40px 0;">Foydalanuvchilar topilmadi.</td>
+                               </tr>
+                           {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Footer -->
+</div>
+
+<!-- Foydalanuvchi qo'shish/tahrirlash uchun Modal Oyna -->
+<div id="user-modal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close" id="user-modal-close-btn">×</span>
+        <div class="modal-header">
+            <h2 id="user-modal-title">Yangi foydalanuvchi qoʻshish</h2>
+        </div>
+        {# Action URL JS orqali o'zgarishi mumkin, lekin default create #}
+        <form id="user-form" method="post" action="{% url 'user_create_update' %}">
+            {% csrf_token %}
+            <input type="hidden" id="user-edit-id" name="user_id"> {# JS buni tahrirlashda to'ldiradi #}
             <div class="modal-body">
-                 <form id="user-form">
-                     <input type="hidden" id="user-edit-id" name="user_id">
-                     <div class="form-grid">
-                         <div class="form-group">
-                             <label for="modal-user-name">Toʻliq ism *</label> <!-- Tarjima qilindi -->
-                             <input type="text" id="modal-user-name" name="name" required placeholder="Foydalanuvchining toʻliq ismi"> <!-- Tarjima qilindi -->
-                         </div>
-                         <div class="form-group">
-                             <label for="modal-user-email">Email *</label> <!-- Tarjima qilindi -->
-                             <input type="email" id="modal-user-email" name="email" required placeholder="foydalanuvchi@example.com"> <!-- Tarjima qilindi -->
-                         </div>
-                         <div class="form-group">
-                             <label for="modal-user-role">Rol *</label> <!-- Tarjima qilindi -->
-                             <select id="modal-user-role" name="role" required>
-                                 <!-- Qiymatlar data.js bilan moslik uchun rus tilida qoladi -->
-                                 <option value="Заявитель">Ariza beruvchi</option> <!-- Tarjima qilindi -->
-                                 <option value="Ревьюер">Tekshiruvchi</option> <!-- Tarjima qilindi -->
-                                 <option value="Администратор">Administrator</option> <!-- Tarjima qilindi -->
-                                 <option value="Супер Админ">Super Admin</option> <!-- Tarjima qilindi -->
-                             </select>
-                         </div>
-                         <div class="form-group">
-                             <label for="modal-user-status">Holat *</label> <!-- Tarjima qilindi -->
-                             <select id="modal-user-status" name="status" required>
-                                 <!-- Qiymatlar data.js bilan moslik uchun rus tilida qoladi -->
-                                 <option value="Активен">Faol</option> <!-- Tarjima qilindi -->
-                                 <option value="Неактивен">Faol emas</option> <!-- Tarjima qilindi -->
-                             </select>
-                         </div>
-                         <div class="form-group" style="grid-column: 1 / -1;">
-                             <label for="modal-user-password">Parol (yangi yoki tiklash uchun)</label> <!-- Tarjima qilindi -->
-                             <input type="password" id="modal-user-password" name="password" placeholder="Oʻzgartirmaslik uchun boʻsh qoldiring" minlength="8"> <!-- Tarjima qilindi -->
-                             <small class="input-hint">Kamida 8 belgi. Tahrirlashda boʻsh qoldirilsa, parol oʻzgarmaydi.</small> <!-- Tarjima qilindi -->
-                         </div>
-                     </div>
-                 </form>
+                 {# Formadagi umumiy xatoliklarni ko'rsatish (agar kerak bo'lsa) #}
+                 <div id="form-non-field-errors" class="form-errors alert alert-danger" style="display: none;"></div>
+                 {# Formani render qilish (form o'zgaruvchisi viewdan keladi) #}
+                 {% include 'includes/form_fields.html' with form=form %}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="user-modal-cancel-btn">Bekor qilish</button> <!-- Tarjima qilindi -->
-                <button type="submit" class="btn btn-primary" form="user-form" id="user-modal-save-btn">Saqlash</button> <!-- Tarjima qilindi -->
+                <button type="button" class="btn btn-secondary" id="user-modal-cancel-btn">Bekor qilish</button>
+                <button type="submit" class="btn btn-primary" id="user-modal-save-btn">Saqlash</button>
             </div>
-        </div>
+        </form>
     </div>
+</div>
+{% endblock content %}
 
-    <!-- Bildirishnomalar uchun konteyner -->
-    <div class="notifications-container" id="notifications-container"></div>
+{% block extra_scripts %}
+{# Modal va AJAX uchun JS kod (users.html uchun) #}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const userModal = document.getElementById('user-modal');
+    const userForm = document.getElementById('user-form');
+    const addUserBtn = document.getElementById('add-user-btn');
+    const editUserBtns = document.querySelectorAll('.edit-btn'); // Tahrirlash tugmalari
+    const toggleStatusBtns = document.querySelectorAll('.toggle-status-btn'); // Status o'zgartirish
+    const userIdInput = document.getElementById('user-edit-id');
+    const modalTitle = document.getElementById('user-modal-title');
+    const saveBtn = document.getElementById('user-modal-save-btn');
+    const modalCloseBtn = document.getElementById('user-modal-close-btn');
+    const modalCancelBtn = document.getElementById('user-modal-cancel-btn');
+    const nonFieldErrorsDiv = document.getElementById('form-non-field-errors');
 
-    <!-- Skriptlar -->
-    <script src="{% static 'js/data.js' %}"></script>
-    <script src="{% static 'js/script.js' %}"></script>
-    <script src="{% static 'js/chart-config.js' %}"></script>
-     <!-- Ushbu sahifa uchun maxsus JS -->
-     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Keraksiz console.log olib tashlandi
-            // DOM elementlarini olish
-            const tableBody = document.querySelector('#users-table tbody');
-            const placeholderRow = tableBody.querySelector('.table-placeholder');
-            const paginationWrapper = document.getElementById('users-pagination');
-            const searchInput = document.getElementById('users-search-input');
-            const roleFilter = document.getElementById('users-role-filter');
-            const statusFilter = document.getElementById('users-status-filter');
-            const addBtn = document.getElementById('add-user-btn');
-            const modal = document.getElementById('user-modal');
-            const modalCloseBtn = document.getElementById('user-modal-close-btn');
-            const modalCancelBtn = document.getElementById('user-modal-cancel-btn');
-            const modalForm = document.getElementById('user-form');
-            const modalTitle = document.getElementById('user-modal-title');
-            const modalSaveBtn = document.getElementById('user-modal-save-btn');
-            const editIdInput = document.getElementById('user-edit-id');
-            const passwordInput = document.getElementById('modal-user-password');
-
-            // Holat o'zgaruvchilari
-            let currentPage = 1;
-            const rowsPerPage = 10;
-            let allUsersData = []; // data.js dan barcha foydalanuvchilar
-            let currentTableData = []; // Filtrlangan/saralangan ma'lumotlar
-            let currentSort = { column: 'name', direction: 'asc' }; // Standart saralash
-
-            // Holatlar uchun tarjima va klasslar/ikonkalar
-             const roleTranslations = {
-                 'Заявитель': 'Ariza beruvchi',
-                 'Администратор': 'Administrator',
-                 'Супер Админ': 'Super Admin',
-                 'Ревьюер': 'Tekshiruvchi'
-             };
-             const statusTranslations = {
-                 'Активен': 'Faol',
-                 'Неактивен': 'Faol emas'
-             };
-             const statusClasses = {
-                 'Активен': 'status-approved',
-                 'Неактивен': 'status-rejected'
-             };
-             const statusIcons = {
-                 'Активен': 'fa-circle-check',
-                 'Неактивен': 'fa-circle-xmark'
-             };
-
-
-            // --- Funksiyalar ---
-
-            // Jadvalni render qilish
-            function renderUsersTable(data) {
-                tableBody.innerHTML = ''; // Eski ma'lumotlarni tozalash
-                if (!data || data.length === 0) {
-                    // Foydalanuvchilar topilmaganda xabar (tarjima qilingan)
-                    tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px 0; color: var(--text-light);">Foydalanuvchilar topilmadi.</td></tr>`;
-                    return;
+    // CSRF token olish funksiyasi
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
                 }
-                const startIndex = (currentPage - 1) * rowsPerPage;
-                const endIndex = startIndex + rowsPerPage;
-                const paginatedData = data.slice(startIndex, endIndex);
-
-                paginatedData.forEach((item, index) => {
-                    // Arizalar sonini hisoblash (demoApplications data.js da mavjud deb faraz qilinadi)
-                    const applicationsCount = item.role === 'Заявитель' && typeof demoApplications !== 'undefined'
-                        ? demoApplications.filter(app => app.applicantId === item.id).length
-                        : '-'; // Boshqa rollar uchun chiziqcha
-
-                    const row = document.createElement('tr');
-                    row.style.opacity = '0'; // Animatsiya uchun
-
-                    const translatedRole = roleTranslations[item.role] || item.role; // Rolni tarjima qilish
-                    const translatedStatus = statusTranslations[item.status] || item.status; // Holatni tarjima qilish
-                    const statusBadgeClass = statusClasses[item.status] || 'status-rejected';
-                    const statusIconClass = statusIcons[item.status] || 'fa-circle-question';
-
-                    // Holatni o'zgartirish tugmasi uchun ikonka va title
-                    const toggleStatusIcon = item.status === 'Активен' ? 'fa-user-slash' : 'fa-user-check';
-                    const toggleStatusTitle = item.status === 'Активен' ? 'Faolsizlantirish' : 'Faollashtirish'; // Tarjima qilindi
-
-                    row.innerHTML = `
-                        <td>
-                            <div class="applicant-info">
-                                <img src="${item.avatar || 'https://i.pravatar.cc/30'}" alt="Avatar" class="applicant-avatar">
-                                <div>
-                                    <span class="applicant-name">${item.name}</span>
-                                    <span class="applicant-email">${item.email}</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>${translatedRole}</td>
-                        <td>${item.registered || '-'}</td> <!-- Agar sana bo'lmasa chiziqcha -->
-                        <td>${applicationsCount}</td>
-                        <td>
-                            <span class="status-badge ${statusBadgeClass}">
-                                <i class="fa-solid ${statusIconClass}"></i> ${translatedStatus}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="edit-btn" title="Tahrirlash" data-userid="${item.id}"><i class="fa-solid fa-user-pen"></i></button> <!-- Tarjima qilindi -->
-                                <button class="delete-btn" title="${toggleStatusTitle}" data-userid="${item.id}"><i class="fa-solid ${toggleStatusIcon}"></i></button>
-                                <button class="view-btn" title="Profilni ko'rish" data-userid="${item.id}"><i class="fa-solid fa-address-card"></i></button> <!-- Tarjima qilindi -->
-                            </div>
-                        </td>`;
-                    tableBody.appendChild(row);
-                    // Animatsiya
-                    setTimeout(() => {
-                        row.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-                        row.style.opacity = '1';
-                        row.style.transform = 'translateY(0)';
-                    }, 50 * index);
-                });
-                addUsersActionListeners(); // Yangi tugmalar uchun event listener'larni qayta bog'lash
             }
+        }
+        return cookieValue;
+    }
 
-            // Sahifalashni render qilish
-            function renderUsersPagination(totalRows) {
-                 if (!paginationWrapper) return;
-                 paginationWrapper.innerHTML = ''; // Eski sahifalashni tozalash
-                 const totalPages = Math.ceil(totalRows / rowsPerPage);
-                 if (totalPages <= 1) return; // Agar bitta sahifa bo'lsa, ko'rsatmaslik
+     // Modalni yopish
+     function closeModal() { userModal.classList.remove('active'); }
 
-                 const startRow = (currentPage - 1) * rowsPerPage + 1;
-                 const endRow = Math.min(currentPage * rowsPerPage, totalRows);
-
-                 // Ma'lumot (tarjima qilingan)
-                 const infoSpan = document.createElement('span');
-                 infoSpan.classList.add('pagination-info');
-                 infoSpan.textContent = `${totalRows} ta foydalanuvchidan ${startRow}-${endRow} koʻrsatilmoqda`;
-                 paginationWrapper.appendChild(infoSpan);
-
-                 const controlsDiv = document.createElement('div');
-                 controlsDiv.classList.add('pagination-controls');
-
-                 // Orqaga tugmasi (tarjima qilingan)
-                 const prevButton = document.createElement('button');
-                 prevButton.classList.add('btn', 'btn-secondary', 'btn-sm');
-                 prevButton.innerHTML = '« Orqaga';
-                 prevButton.disabled = currentPage === 1;
-                 prevButton.addEventListener('click', () => {
-                     if (currentPage > 1) {
-                         currentPage--;
-                         renderUsersTable(currentTableData);
-                         renderUsersPagination(totalRows);
-                     }
-                 });
-                 controlsDiv.appendChild(prevButton);
-
-                 // Oldinga tugmasi (tarjima qilingan)
-                 const nextButton = document.createElement('button');
-                 nextButton.classList.add('btn', 'btn-secondary', 'btn-sm');
-                 nextButton.innerHTML = 'Oldinga »';
-                 nextButton.disabled = currentPage === totalPages;
-                 nextButton.addEventListener('click', () => {
-                     if (currentPage < totalPages) {
-                         currentPage++;
-                         renderUsersTable(currentTableData);
-                         renderUsersPagination(totalRows);
-                     }
-                 });
-                 controlsDiv.appendChild(nextButton);
-
-                 paginationWrapper.appendChild(controlsDiv);
-            }
-
-            // Ma'lumotlarni saralash
-            function sortUsersData(data, column, direction) {
-                 return [...data].sort((a, b) => {
-                     let valA, valB;
-                     switch(column) {
-                         case 'name': valA = a.name.toLowerCase(); valB = b.name.toLowerCase(); break;
-                         case 'role': valA = a.role.toLowerCase(); valB = b.role.toLowerCase(); break;
-                         case 'registered':
-                             try {
-                                valA = new Date(a.registered); valB = new Date(b.registered);
-                                if(isNaN(valA)) valA = new Date(0); if(isNaN(valB)) valB = new Date(0);
-                             } catch (e) { valA = 0; valB = 0; }
-                             break;
-                         case 'status': valA = a.status.toLowerCase(); valB = b.status.toLowerCase(); break;
-                         default: valA = a.name.toLowerCase(); valB = b.name.toLowerCase(); // Standart ism bo'yicha
-                     }
-                     if (valA < valB) return direction === 'asc' ? -1 : 1;
-                     if (valA > valB) return direction === 'asc' ? 1 : -1;
-                     return 0;
-                 });
-            }
-
-            // Filtrlash va ko'rsatish
-            function filterAndDisplayUsers() {
-                 const searchTerm = searchInput.value.toLowerCase().trim();
-                 const selectedRole = roleFilter.value; // Rol qiymati rus tilida qoladi
-                 const selectedStatus = statusFilter.value; // Holat qiymati rus tilida qoladi
-                 currentPage = 1; // Birinchi sahifaga qaytish
-
-                 const filtered = allUsersData.filter(item => {
-                     const nameMatch = item.name.toLowerCase().includes(searchTerm);
-                     const emailMatch = item.email.toLowerCase().includes(searchTerm);
-                     const roleMatchFilter = !selectedRole || item.role === selectedRole;
-                     const statusMatchFilter = !selectedStatus || item.status === selectedStatus;
-                     // Qidiruv termini rol yoki statusning tarjimasiga ham mos kelishini tekshirish (ixtiyoriy)
-                     const roleTranslatedMatch = (roleTranslations[item.role] || '').toLowerCase().includes(searchTerm);
-                     const statusTranslatedMatch = (statusTranslations[item.status] || '').toLowerCase().includes(searchTerm);
-
-                     return (nameMatch || emailMatch || roleTranslatedMatch || statusTranslatedMatch) && roleMatchFilter && statusMatchFilter;
-                 });
-
-                 currentTableData = sortUsersData(filtered, currentSort.column, currentSort.direction);
-                 renderUsersTable(currentTableData);
-                 renderUsersPagination(currentTableData.length);
-                 updateUsersSortHeaders(); // Saralash indikatorlarini yangilash
-            }
-
-            // Modal oynani ochish
-             function openUserModal(user = null) {
-                 modalForm.reset(); // Formani tozalash
-                 editIdInput.value = ''; // ID ni tozalash
-                 passwordInput.required = false; // Parol sukut bo'yicha majburiy emas (tahrirlashda)
-                 passwordInput.style.borderColor = ''; // Xato chegarasini olib tashlash
-
-                 if (user) { // Tahrirlash rejimi
-                     modalTitle.textContent = 'Foydalanuvchini tahrirlash'; // Tarjima qilindi
-                     editIdInput.value = user.id;
-                     document.getElementById('modal-user-name').value = user.name || '';
-                     document.getElementById('modal-user-email').value = user.email || '';
-                     document.getElementById('modal-user-role').value = user.role || 'Заявитель';
-                     document.getElementById('modal-user-status').value = user.status || 'Активен';
-                     passwordInput.placeholder = 'Oʻzgartirmaslik uchun boʻsh qoldiring'; // Tarjima qilindi
-                 } else { // Qo'shish rejimi
-                     modalTitle.textContent = 'Yangi foydalanuvchi qoʻshish'; // Tarjima qilindi
-                     passwordInput.required = true; // Yangi foydalanuvchi uchun parol majburiy
-                     passwordInput.placeholder = 'Parolni kiriting (kamida 8 belgi)'; // Tarjima qilindi
-                 }
-                 modal.classList.add('active'); // Modalni ko'rsatish
-                 // Birinchi inputga fokus berish
-                  setTimeout(() => {
-                     document.getElementById('modal-user-name')?.focus();
-                  }, 100);
-             }
-
-             // Modal oynani yopish
-             function closeUserModal() {
-                 modal.classList.remove('active');
-             }
-
-             // Foydalanuvchini saqlash (demo)
-            function saveUser(e) {
-                 e.preventDefault(); // Standart jo'natishni to'xtatish
-                 const formData = new FormData(modalForm);
-                 const userData = Object.fromEntries(formData.entries());
-                 const idToEdit = parseInt(userData.user_id);
-                 const password = userData.password;
-
-                 // Parol validatsiyasi (agar kiritilgan bo'lsa yoki yangi foydalanuvchi bo'lsa)
-                 if ((!idToEdit && (!password || password.length < 8)) || (idToEdit && password && password.length < 8)) {
-                     if(typeof showToast === 'function') showToast('Parol kamida 8 belgidan iborat boʻlishi kerak.', 'Xatolik', 'error'); // Tarjima qilindi
-                     passwordInput.focus();
-                     passwordInput.style.borderColor = 'var(--accent-red)'; // Xato chegarasini ko'rsatish
-                     return; // Jarayonni to'xtatish
-                 }
-                 passwordInput.style.borderColor = ''; // Xatolik yo'q bo'lsa, chegara rangini tiklash
-
-                 // demoApplicants data.js da mavjud deb faraz qilinadi
-                  if (typeof demoApplicants === 'undefined') {
-                     if(typeof showToast === 'function') showToast('Maʼlumotlar bazasi topilmadi (demo).', 'Xatolik', 'error'); // Tarjima qilindi
-                     return;
-                  }
-
-
-                 if (idToEdit) { // Tahrirlash
-                     const index = demoApplicants.findIndex(u => u.id === idToEdit);
-                     if (index !== -1) {
-                         // Ma'lumotlarni yangilash, parol kiritilmagan bo'lsa o'zgartirmaslik
-                         const updatedUser = {
-                             ...demoApplicants[index], // Eski ma'lumotlar
-                             name: userData.name,
-                             email: userData.email,
-                             role: userData.role,
-                             status: userData.status
-                         };
-                         // Parolni backendda yangilash kerak bo'ladi, bu yerda faqat ma'lumotlarni yangilaymiz
-                         demoApplicants[index] = updatedUser;
-                         if(typeof showToast === 'function') showToast(`#${idToEdit} raqamli foydalanuvchi yangilandi.`, 'Muvaffaqiyatli', 'success'); // Tarjima qilindi
-                     } else {
-                          if(typeof showToast === 'function') showToast(`#${idToEdit} raqamli foydalanuvchi topilmadi.`, 'Xatolik', 'error'); // Tarjima qilindi
-                          return;
-                     }
-                 } else { // Qo'shish
-                     // Yangi ID yaratish
-                     const newId = demoApplicants.length > 0 ? Math.max(...demoApplicants.map(u => u.id)) + 1 : 1;
-                     const newUser = {
-                         id: newId,
-                         name: userData.name,
-                         email: userData.email,
-                         role: userData.role,
-                         status: userData.status,
-                         avatar: `https://i.pravatar.cc/40?img=${(newId % 70) + 1}`, // Tasodifiy avatar
-                         registered: new Date().toISOString().split('T')[0], // Joriy sana
-                         // Parolni frontendda saqlamaymiz
-                     };
-                     demoApplicants.push(newUser);
-                     if(typeof showToast === 'function') showToast(`"${userData.name}" foydalanuvchisi qo'shildi.`, 'Muvaffaqiyatli', 'success'); // Tarjima qilindi
-                 }
-                 allUsersData = [...demoApplicants]; // Asosiy ma'lumotlar massivini yangilash
-                 filterAndDisplayUsers(); // Jadvalni yangilash
-                 closeUserModal(); // Modalni yopish
-             }
-
-            // Foydalanuvchi holatini o'zgartirish (faol/faol emas) (demo)
-             function toggleUserStatus(userId) {
-                 // findApplicant funksiyasi data.js yoki script.js da mavjud deb faraz qilinadi
-                 const user = typeof findApplicant === 'function' ? findApplicant(userId) : allUsersData.find(u => u.id === userId);
-
-                 if (user && user.role !== 'Супер Админ') { // Super Adminni o'zgartirib bo'lmaydi
-                     const currentStatus = user.status; // Joriy holat (rus tilida)
-                     const actionText = currentStatus === 'Активен' ? 'faolsizlantirishni' : 'faollashtirishni'; // Tarjima qilindi
-                     const nextStatus = currentStatus === 'Активен' ? 'Неактивен' : 'Активен'; // Keyingi holat (rus tilida)
-                     const translatedNextStatus = statusTranslations[nextStatus] || nextStatus; // Tarjima qilingan holat nomi
-
-                     if (confirm(`Haqiqatan ham "${user.name}" foydalanuvchisini ${actionText} xohlaysizmi?`)) { // Tarjima qilindi
-                          // demoApplicants data.js da mavjud deb faraz qilinadi
-                         if (typeof demoApplicants !== 'undefined') {
-                            const index = demoApplicants.findIndex(u => u.id === userId);
-                            if (index !== -1) {
-                                demoApplicants[index].status = nextStatus; // Holatni o'zgartirish
-                                if(typeof showToast === 'function') showToast(`Foydalanuvchi holati "${translatedNextStatus}" ga o'zgartirildi (demo).`, 'Muvaffaqiyatli', 'success'); // Tarjima qilindi
-                                allUsersData = [...demoApplicants]; // Asosiy ma'lumotlarni yangilash
-                                filterAndDisplayUsers(); // Jadvalni yangilash
-                            }
-                         } else {
-                            if(typeof showToast === 'function') showToast('Maʼlumotlar bazasi topilmadi (demo).', 'Xatolik', 'error'); // Tarjima qilindi
-                         }
-                     }
-                 } else if (user && user.role === 'Супер Админ') {
-                     if(typeof showToast === 'function') showToast('Super Admin holatini oʻzgartirib boʻlmaydi.', 'Xatolik', 'error'); // Tarjima qilindi
-                 } else {
-                     if(typeof showToast === 'function') showToast('Foydalanuvchi topilmadi.', 'Xatolik', 'error'); // Tarjima qilindi
-                 }
-             }
-
-             // Jadvaldagi harakat tugmalari uchun event listener'lar
-            function addUsersActionListeners() {
-                 // Tahrirlash tugmasi
-                 tableBody.querySelectorAll('.edit-btn').forEach(btn => {
-                     btn.addEventListener('click', (e) => {
-                         const userId = parseInt(e.currentTarget.dataset.userid);
-                         const user = typeof findApplicant === 'function' ? findApplicant(userId) : allUsersData.find(u => u.id === userId);
-                         if (user) {
-                             openUserModal(user);
-                         } else {
-                              if(typeof showToast === 'function') showToast('Tahrirlash uchun foydalanuvchi topilmadi.', 'Xatolik', 'error'); // Tarjima qilindi
-                         }
-                     });
-                 });
-                 // Holatni o'zgartirish tugmasi
-                 tableBody.querySelectorAll('.delete-btn').forEach(btn => {
-                     btn.addEventListener('click', (e) => {
-                         const userId = parseInt(e.currentTarget.dataset.userid);
-                         toggleUserStatus(userId);
-                     });
-                 });
-                 // Profilni ko'rish tugmasi
-                 tableBody.querySelectorAll('.view-btn').forEach(btn => {
-                     btn.addEventListener('click', () => {
-                         // TODO: Profilni ko'rish funksiyasini amalga oshirish
-                         if(typeof showToast === 'function') showToast('Profilni koʻrish hozircha mavjud emas.', 'Maʼlumot', 'info'); // Tarjima qilindi
-                     });
-                 });
-            }
-
-            // Saralash sarlavhalarini yangilash
-             function updateUsersSortHeaders() {
-                 usersTableHeaders.forEach(h => {
-                     h.classList.remove('sort-asc', 'sort-desc'); // Eski klasslarni olib tashlash
-                     if (h.getAttribute('data-sort') === currentSort.column) {
-                         h.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc'); // Joriy klassni qo'shish
-                     }
-                 });
-             }
-
-             // Sahifani initsializatsiya qilish
-            function initUsersPage() {
-                 if(placeholderRow) placeholderRow.style.display = 'none'; // Yuklanish indikatorini yashirish
-                 // Foydalanuvchilarni yuklash (demoApplicants data.js da mavjud deb faraz qilinadi)
-                 allUsersData = typeof demoApplicants !== 'undefined' ? [...demoApplicants] : [];
-                 filterAndDisplayUsers(); // Boshlang'ich filtr va saralash bilan ko'rsatish
-            }
-
-            // --- Event Listener'lar ---
-
-            // Sarlavhaga bosib saralash
-             const usersTableHeaders = document.querySelectorAll('#users-table th[data-sort]');
-             usersTableHeaders.forEach(header => {
-                 header.addEventListener('click', () => {
-                     const sortColumn = header.getAttribute('data-sort');
-                     let sortDirection = 'asc'; // Standart yo'nalish
-                     if (currentSort.column === sortColumn) {
-                         sortDirection = currentSort.direction === 'asc' ? 'desc' : 'asc'; // Yo'nalishni almashtirish
-                     } // Aks holda 'asc' qoladi
-                     currentSort = { column: sortColumn, direction: sortDirection }; // Joriy saralashni yangilash
-                     filterAndDisplayUsers(); // Yangi saralash bilan qayta chizish
-                 });
-             });
-
-            // Qidiruv va filtrlar o'zgarganda qayta chizish
-            searchInput.addEventListener('input', filterAndDisplayUsers);
-            roleFilter.addEventListener('change', filterAndDisplayUsers);
-            statusFilter.addEventListener('change', filterAndDisplayUsers);
-
-            // Modal oyna bilan ishlash
-            addBtn.addEventListener('click', () => openUserModal()); // Qo'shish tugmasi
-            modalCloseBtn.addEventListener('click', closeUserModal); // Yopish (X)
-            modalCancelBtn.addEventListener('click', closeUserModal); // Bekor qilish tugmasi
-            modal.addEventListener('click', (e) => { if (e.target === modal) closeUserModal(); }); // Tashqariga bosganda yopish
-            modalForm.addEventListener('submit', saveUser); // Saqlash tugmasi (forma submit bo'lganda)
-
-            // --- Sahifani ishga tushirish ---
-            setTimeout(initUsersPage, 300); // Kichik kechikish bilan boshlash
+    // Formadagi xatoliklarni tozalash
+    function clearFormErrors() {
+        nonFieldErrorsDiv.style.display = 'none';
+        nonFieldErrorsDiv.innerHTML = '';
+        userForm.querySelectorAll('.form-group').forEach(fg => {
+            fg.classList.remove('has-error');
+            fg.querySelector('.error-message')?.remove();
         });
-     </script>
-</body>
-</html>
+         userForm.querySelectorAll('input, select').forEach(inp => inp.style.borderColor = '');
+    }
+
+    // Formadagi xatoliklarni ko'rsatish
+    function displayFormErrors(errors) {
+        clearFormErrors();
+        for (const field in errors) {
+            if (field === '__all__') {
+                nonFieldErrorsDiv.innerHTML = errors[field].join('<br>');
+                nonFieldErrorsDiv.style.display = 'block';
+            } else {
+                const input = userForm.elements[field];
+                if (input) {
+                    const formGroup = input.closest('.form-group');
+                    formGroup?.classList.add('has-error');
+                     input.style.borderColor = 'var(--accent-red)'; // Highlight invalid input
+                    const errorSpan = document.createElement('span');
+                    errorSpan.classList.add('error-message');
+                    errorSpan.innerHTML = errors[field].join(', ');
+                    // Labeldan keyin yoki inputdan keyin qo'shish
+                    input.parentNode.insertBefore(errorSpan, input.nextSibling);
+                }
+            }
+        }
+    }
+
+    // Tahrirlash uchun modalni ochish
+    function openModalForEdit(userId) {
+        clearFormErrors();
+        fetch(`/manage/users/details/${userId}/`, {
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+        })
+        .then(response => response.ok ? response.json() : Promise.reject('Error fetching user details'))
+        .then(data => {
+            userIdInput.value = data.id;
+            userForm.elements['name'].value = data.name;
+            userForm.elements['email'].value = data.email;
+            userForm.elements['role'].value = data.role;
+            userForm.elements['is_active'].checked = data.is_active; // Bu is_active uchun CheckboxInput bo'lishi kerak
+            const passwordInput = userForm.elements['password'];
+            passwordInput.value = '';
+            passwordInput.placeholder = 'Oʻzgartirmaslik uchun boʻsh qoldiring';
+            passwordInput.required = false; // Tahrirlashda majburiy emas
+            modalTitle.textContent = 'Foydalanuvchini tahrirlash';
+            userModal.classList.add('active');
+             setTimeout(() => { userForm.elements['name']?.focus(); }, 100);
+        })
+        .catch(error => {
+            console.error('Error fetching user details:', error);
+            showToast('Foydalanuvchi maʼlumotlarini olishda xatolik.', 'Xatolik', 'error');
+        });
+    }
+
+    // Qo'shish uchun modalni ochish
+    addUserBtn.addEventListener('click', () => {
+        clearFormErrors();
+        userForm.reset();
+        userIdInput.value = '';
+        userForm.elements['password'].placeholder = 'Parolni kiriting (kamida 8 belgi)';
+        userForm.elements['password'].required = true; // Qo'shishda majburiy
+        userForm.elements['is_active'].checked = true; // Yangi user faol bo'lsin
+        modalTitle.textContent = 'Yangi foydalanuvchi qoʻshish';
+        userModal.classList.add('active');
+         setTimeout(() => { userForm.elements['name']?.focus(); }, 100);
+    });
+
+    // Tahrirlash tugmalari uchun listener
+    editUserBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const userId = e.currentTarget.dataset.userid;
+            openModalForEdit(userId);
+        });
+    });
+
+    // Modalni yopish tugmalari
+    modalCloseBtn.addEventListener('click', closeModal);
+    modalCancelBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+    // Formani jo'natish (AJAX)
+    userForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saqlanmoqda...';
+        clearFormErrors(); // Oldingi xatoliklarni tozalash
+
+        const formData = new FormData(userForm);
+        const url = userForm.action; // Form actionidan URLni olish
+
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        // .then(response => response.json().then(data => ({ status: response.status, body: data }))) // Bu usul xatolik berishi mumkin agar javob JSON bo'lmasa
+        .then(response => {
+             // Javobni tekshirish (redirect bo'lishi mumkin)
+             if (response.redirected) {
+                 window.location.href = response.url; // Agar redirect bo'lsa, o'sha yerga o'tish
+                 return { success: true }; // Muvaffaqiyatli deb hisoblash
+             }
+             if (!response.ok) {
+                 // Agar javob OK bo'lmasa, JSON xatolikni olishga harakat qilish
+                 return response.json().then(err => Promise.reject(err));
+             }
+             return response.json(); // Agar javob OK bo'lsa JSONni olish
+         })
+        .then(data => {
+             // Agar redirect bo'lmagan bo'lsa va success true bo'lsa
+             if (data && data.success) {
+                closeModal();
+                window.location.reload(); // Sahifani yangilash eng oson yo'li
+             } else if (data && !data.success && data.errors) {
+                 // Agar backend JSON xatolik qaytargan bo'lsa
+                 displayFormErrors(data.errors);
+                 showToast('Iltimos, formadagi xatoliklarni toʻgʻrilang.', 'Xatolik', 'error', 7000);
+             }
+             // Agar redirect bo'lgan bo'lsa, bu qism ishlamaydi
+        })
+        .catch(errorData => { // Bu yerda backenddan kelgan JSON xatolik yoki network xatoligi bo'lishi mumkin
+            console.error('Error saving user:', errorData);
+            if (errorData && errorData.errors) { // Agar backenddan JSON xatolik kelgan bo'lsa
+                 displayFormErrors(errorData.errors);
+                 showToast('Iltimos, formadagi xatoliklarni toʻgʻrilang.', 'Xatolik', 'error', 7000);
+            } else { // Network yoki boshqa xatolik
+                showToast('Server bilan bogʻlanishda yoki saqlashda xatolik.', 'Xatolik', 'error');
+                nonFieldErrorsDiv.innerHTML = 'Server bilan bogʻlanishda yoki saqlashda xatolik yuz berdi.';
+                nonFieldErrorsDiv.style.display = 'block';
+            }
+        })
+        .finally(() => {
+             saveBtn.disabled = false;
+             saveBtn.innerHTML = 'Saqlash';
+        });
+    });
+
+    // Statusni o'zgartirish (AJAX POST)
+    toggleStatusBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const button = e.currentTarget;
+            const url = button.dataset.url;
+            const csrf = button.dataset.csrf;
+            const userId = button.dataset.userid;
+
+            if (!confirm('Haqiqatan ham foydalanuvchi holatini oʻzgartirmoqchimisiz?')) return;
+
+            button.disabled = true;
+            button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrf,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.ok ? response.json() : Promise.reject('Error toggling status'))
+            .then(data => {
+                 if (data.success) {
+                     // Jadvaldagi statusni yangilash
+                     const statusCell = document.getElementById(`status-cell-${userId}`);
+                     if (statusCell) {
+                          statusCell.innerHTML = `<span class="status-badge ${data.is_active ? 'status-approved' : 'status-rejected'}"><i class="fa-solid ${data.is_active ? 'fa-circle-check' : 'fa-circle-xmark'}"></i> ${data.status_display}</span>`;
+                     }
+                     // Tugmani yangilash
+                     button.title = data.is_active ? 'Faolsizlantirish' : 'Faollashtirish';
+                     button.innerHTML = `<i class="fa-solid ${data.is_active ? 'fa-user-slash' : 'fa-user-check'}"></i>`;
+                     showToast('Foydalanuvchi holati muvaffaqiyatli oʻzgartirildi.', 'Muvaffaqiyatli', 'success');
+                 } else {
+                     showToast('Holatni oʻzgartirishda xatolik.', 'Xatolik', 'error');
+                 }
+            })
+            .catch(error => {
+                console.error("Error toggling status:", error);
+                showToast('Server bilan bogʻlanishda xatolik.', 'Xatolik', 'error');
+                 // Tugmani asl holiga qaytarish (ixtiyoriy)
+                  const originalIcon = button.querySelector('i').className.includes('fa-user-slash') ? 'fa-user-slash' : 'fa-user-check';
+                  button.innerHTML = `<i class="fa-solid ${originalIcon}"></i>`;
+            })
+            .finally(() => {
+                button.disabled = false;
+            });
+        });
+    });
+
+});
+</script>
 {% endblock %}

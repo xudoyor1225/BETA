@@ -1,328 +1,101 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block content %}
+<div class="main-content-wrapper">
+    <!-- Header -->
+     <header class="main-header">
+        <div class="header-left">
+           <button class="menu-toggle-btn" id="menu-toggle" title="Menyuni yig'ish/kengaytirish" aria-label="Menyu">
+               <i class="fa-solid fa-bars"></i>
+           </button>
+       </div>
+       <div class="header-right">
+            {# request.user obyektidan foydalanamiz #}
+            <div class="profile-dropdown" title="Profil sozlamalari">
+            </div>
+       </div>
+   </header>
 
-        <!-- Asosiy kontent uchun o'ram -->
-        <div class="main-content-wrapper">
-            <!-- Header (minimal) -->
-             <header class="main-header">
-                 <div class="header-left">
-                     <button class="menu-toggle-btn" id="menu-toggle" title="Menyuni yig'ish/kengaytirish" aria-label="Menyu"> <!-- Tarjima qilindi -->
-                         <i class="fa-solid fa-bars"></i>
-                     </button>
-                 </div>
-                 <div class="header-right">
-                     <!-- Profil rasmi va dropdown -->
-                     <div class="profile-dropdown" title="Profil sozlamalari"> <!-- Tarjima qilindi -->
-                         <img src="https://i.pravatar.cc/40?img=4" alt="Avatar" class="profile-avatar" id="header-avatar">
-                     </div>
-                 </div>
-             </header>
+    <!-- Sahifa kontenti -->
+    <main class="page-content">
+        <h1 class="page-title">Profil Sozlamalari</h1>
+         <div class="animate-on-load">
+             <div class="settings-container" style="display: flex; gap: 30px;">
+                 {# Asosiy kontent #}
+                 <section class="settings-content" style="flex: 1;">
+                     {# Forma boshlanishi - fayl yuklash uchun enctype #}
+                     <form method="post" enctype="multipart/form-data">
+                          {% csrf_token %}
 
-            <!-- Sahifa kontenti -->
-            <main class="page-content">
-                <h1 class="page-title">Hisob Sozlamalari</h1> <!-- Tarjima qilindi -->
-                <div class="settings-container animate-on-load">
-                    <!-- Sozlamalar menyusi -->
-                    <aside class="settings-sidebar">
-                        <ul class="settings-menu">
-                             <li><a href="#profile" class="active"><i class="fa-solid fa-user-gear"></i> Profil</a></li> <!-- Tarjima qilindi -->
-                             <li><a href="#notifications"><i class="fa-solid fa-bell"></i> Bildirishnomalar</a></li> <!-- Tarjima qilindi -->
-                             <!-- Xavfsizlik sahifasiga havola qoldirildi -->
-                             <li><a href="{% url 'security' %}"><i class="fa-solid fa-shield-halved"></i> Xavfsizlik</a></li> <!-- Tarjima qilindi -->
-                             <li><a href="#privacy"><i class="fa-solid fa-user-secret"></i> Maxfiylik</a></li> <!-- Tarjima qilindi -->
-                         </ul>
-                    </aside>
-                    <!-- Sozlamalar kontenti -->
-                    <section class="settings-content">
-                        <!-- Profil bo'limi -->
-                        <div class="settings-section" id="profile">
-                            <h2><i class="fa-solid fa-user-gear"></i> Profil Sozlamalari</h2> <!-- Tarjima qilindi -->
-                            <form id="profile-form">
-                                <div class="profile-picture-section">
-                                    <img src="https://i.pravatar.cc/100?img=4" alt="Joriy avatar" id="profile-picture-preview" class="profile-picture-preview"> <!-- Tarjima qilindi -->
-                                    <div class="profile-picture-actions">
-                                        <label for="profile-picture-upload" class="btn btn-primary btn-sm"><i class="fa-solid fa-upload"></i> Yangisini yuklash</label> <!-- Tarjima qilindi -->
-                                        <input type="file" id="profile-picture-upload" name="avatar" accept="image/*" style="display: none;">
-                                        <button type="button" class="btn btn-secondary btn-sm" id="remove-picture-btn"><i class="fa-solid fa-trash"></i> Oʻchirish</button> <!-- Tarjima qilindi -->
-                                        <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 5px;">Tavsiya etilgan oʻlcham: 200x200px, JPG/PNG.</p> <!-- Tarjima qilindi -->
-                                    </div>
+                          {# Shaxsiy ma'lumotlar bo'limi #}
+                          <div class="settings-section" id="personal-info">
+                              <h2><i class="fa-regular fa-address-card"></i> Shaxsiy ma'lumotlar</h2>
+
+                              {# Agar formset yoki alohida formalar bo'lsa, xatoliklarni ko'rsatish #}
+                              {% if user_form.non_field_errors or profile_form.non_field_errors %}
+                                <div class="form-errors alert alert-danger">
+                                    {{ user_form.non_field_errors }}
+                                    {{ profile_form.non_field_errors }}
                                 </div>
-                                <div class="form-grid" style="margin-top: 30px;">
-                                    <div class="form-group">
-                                        <label for="profile-name">Toʻliq ism</label> <!-- Tarjima qilindi -->
-                                        <input type="text" id="profile-name" name="name" value="Aydos Erbolatov" required>
-                                    </div>
-                                     <div class="form-group">
-                                         <label for="profile-email">Email (oʻzgartirib boʻlmaydi)</label> <!-- Tarjima qilindi -->
-                                         <input type="email" id="profile-email" name="email" value="aidos.e@example.com" readonly disabled>
-                                     </div>
-                                     <div class="form-group">
-                                         <label for="profile-phone">Bogʻlanish telefoni</label> <!-- Tarjima qilindi -->
-                                         <input type="tel" id="profile-phone" name="phone" placeholder="+998 (XX) XXX-XX-XX"> <!-- O'zbekiston formatiga moslashtirildi -->
-                                     </div>
-                                     <div class="form-group">
-                                         <label for="profile-birthdate">Tugʻilgan sana</label> <!-- Tarjima qilindi -->
-                                         <input type="date" id="profile-birthdate" name="birthdate">
-                                     </div>
-                                     <div class="form-group" style="grid-column: 1 / -1;">
-                                         <label for="profile-bio">Oʻzingiz haqingizda (qisqacha)</label> <!-- Tarjima qilindi -->
-                                         <textarea id="profile-bio" name="bio" rows="4" placeholder="Oʻzingiz haqingizda qisqacha ma'lumot bering..."></textarea> <!-- Tarjima qilindi -->
-                                     </div>
-                                </div>
-                                <div style="text-align: right; margin-top: 20px;">
-                                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Profilni saqlash</button> <!-- Tarjima qilindi -->
-                                </div>
-                            </form>
-                        </div>
-                        <!-- Bildirishnomalar bo'limi -->
-                        <div class="settings-section" id="notifications">
-                             <h2><i class="fa-solid fa-bell"></i> Bildirishnoma Sozlamalari</h2> <!-- Tarjima qilindi -->
-                             <form id="notifications-form">
-                                 <p style="color: var(--text-medium); margin-bottom: 20px;">Emailga bildirishnomalarni qabul qilish (<span id="notification-email">aidos.e@example.com</span>):</p> <!-- Tarjima qilindi -->
-                                 <div class="form-group">
-                                     <label class="checkbox-label" style="display: flex; align-items: center; gap: 10px;">
-                                         <input type="checkbox" name="notify_status_change" checked>
-                                         <span>Mening arizalarim holati oʻzgarganda</span> <!-- Tarjima qilindi -->
-                                     </label>
-                                 </div>
-                                  <div class="form-group">
-                                      <label class="checkbox-label" style="display: flex; align-items: center; gap: 10px;">
-                                          <input type="checkbox" name="notify_new_scholarship" checked>
-                                          <span>Qiziqishlarim boʻyicha yangi stipendiyalar (tez kunda!)</span> <!-- Tarjima qilindi -->
-                                      </label>
-                                  </div>
-                                  <div class="form-group">
-                                      <label class="checkbox-label" style="display: flex; align-items: center; gap: 10px;">
-                                          <input type="checkbox" name="notify_deadline_reminder">
-                                          <span>Muddatlar haqida eslatmalar</span> <!-- Tarjima qilindi -->
-                                      </label>
-                                  </div>
-                                  <div class="form-group">
-                                      <label class="checkbox-label" style="display: flex; align-items: center; gap: 10px;">
-                                          <input type="checkbox" name="notify_platform_news" checked>
-                                          <span>Platforma yangiliklari</span> <!-- Tarjima qilindi -->
-                                      </label>
-                                  </div>
-                                 <div style="text-align: right; margin-top: 20px;">
-                                     <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Bildirishnomalarni saqlash</button> <!-- Tarjima qilindi -->
-                                 </div>
-                             </form>
-                         </div>
-                         <!-- Maxfiylik bo'limi -->
-                         <div class="settings-section" id="privacy">
-                            <h2><i class="fa-solid fa-user-secret"></i> Maxfiylik Sozlamalari</h2> <!-- Tarjima qilindi -->
-                            <form id="privacy-form">
-                                 <div class="form-group">
-                                     <label class="checkbox-label" style="display: flex; align-items: center; gap: 10px;">
-                                         <input type="checkbox" name="privacy_show_profile">
-                                         <span>Profilni boshqa foydalanuvchilarga koʻrsatish</span> <!-- Tarjima qilindi -->
-                                     </label>
-                                 </div>
-                                  <div class="form-group">
-                                      <label class="checkbox-label" style="display: flex; align-items: center; gap: 10px;">
-                                          <input type="checkbox" name="privacy_share_anonymized_data" checked>
-                                          <span>Statistika uchun anonim maʼlumotlardan foydalanishga ruxsat berish</span> <!-- Tarjima qilindi -->
-                                      </label>
-                                  </div>
-                                 <div style="margin-top: 20px;">
-                                     <a href="#" class="btn btn-secondary btn-sm"><i class="fa-solid fa-download"></i> Maʼlumotlarimni yuklab olish</a> <!-- Tarjima qilindi -->
-                                     <button type="button" id="delete-account-btn" class="btn btn-danger btn-sm" style="margin-left: 10px;"><i class="fa-solid fa-user-times"></i> Hisobni oʻchirish</button> <!-- Tarjima qilindi -->
-                                 </div>
-                                 <div style="text-align: right; margin-top: 20px;">
-                                     <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Maxfiylikni saqlash</button> <!-- Tarjima qilindi -->
-                                 </div>
-                            </form>
-                        </div>
-                    </section>
-                </div>
-            </main>
+                              {% endif %}
 
-            <!-- Footer -->
-            <footer class="main-footer">
-                <!-- Tarjima qilingan footer -->
-                🚀 "Shaffof Imkoniyat" Boshqaruv Paneli v1.1 | Halol kelajak uchun <i class="fa-solid fa-heart"></i> bilan yaratilgan | <a href="#">Loyihani qo'llab-quvvatlash</a>
-            </footer>
-        </div>
-    </div>
+                              <div class="form-grid">
+                                   {# UserForm maydonlari #}
+                                   {% include 'includes/form_field.html' with field=user_form.first_name %}
+                                   {% include 'includes/form_field.html' with field=user_form.last_name %}
 
-    <!-- Bildirishnomalar uchun konteyner -->
-    <div class="notifications-container" id="notifications-container"></div>
+                                    {# ProfileForm maydonlari (avatarsiz) #}
+                                    {% include 'includes/form_field.html' with field=profile_form.phone %}
+                                    {% include 'includes/form_field.html' with field=profile_form.birth_date %}
+                                    {% include 'includes/form_field.html' with field=profile_form.iin %}
+                                    {% include 'includes/form_field.html' with field=profile_form.address %}
 
-    <!-- Skriptlar -->
-    <script src="{% static 'js/data.js' %}"></script>
-    <script src="{% static 'js/script.js' %}"></script>
-    <!-- Chart.js bu sahifada ishlatilmasa ham, chart-config bo'lishi mumkin -->
-    <script src="{% static 'js/chart-config.js' %}"></script>
-     <!-- Ushbu sahifa uchun maxsus JS -->
-     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Keraksiz console.log olib tashlandi
-            const currentUserId = 9; // Demo uchun ID (Aydos Erbolatov)
-            // findApplicant funksiyasi data.js yoki script.js da mavjud deb faraz qilinadi
-            const currentUser = typeof findApplicant === 'function' ? findApplicant(currentUserId) : null;
+                                   {# Avatar uchun alohida joy #}
+                                   <div class="form-group {% if profile_form.avatar.errors %}has-error{% endif %}" style="grid-column: 1 / -1;">
+                                       <label for="{{ profile_form.avatar.id_for_label }}">{{ profile_form.avatar.label }}</label>
+                                       <div style="display: flex; align-items: center; gap: 15px;">
+                                            {# Joriy avatarni ko'rsatish #}
+                                           <div>
+                                               {{ profile_form.avatar }} {# Fayl input #}
+                                               {% if profile_form.avatar.help_text %}
+                                                   <small class="input-hint">{{ profile_form.avatar.help_text|safe }}</small>
+                                               {% endif %}
+                                               {% for error in profile_form.avatar.errors %}
+                                                   <span class="error-message">{{ error }}</span>
+                                               {% endfor %}
+                                           </div>
+                                       </div>
+                                   </div>
+                              </div>
+                          </div>
 
-            // Yon panel va headerdagi foydalanuvchi ma'lumotlari uchun elementlar
-            const sidebarAvatar = document.getElementById('sidebar-avatar');
-            const sidebarUserName = document.getElementById('sidebar-user-name');
-            const sidebarUserRole = document.getElementById('sidebar-user-role');
-            const headerAvatar = document.getElementById('header-avatar');
+                           {# Formani saqlash tugmasi #}
+                          <div style="text-align: right; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                              <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Oʻzgarishlarni Saqlash</button>
+                          </div>
+                     </form> {# Forma tugashi #}
+                 </section>
+             </div>
+         </div>
+    </main>
+    <!-- Footer -->
+</div>
+{% endblock content %}
 
-            // Foydalanuvchi ma'lumotlarini yuklash
-            if (currentUser) {
-                // Formadagi maydonlarni to'ldirish
-                document.getElementById('profile-name').value = currentUser.name || '';
-                document.getElementById('profile-email').value = currentUser.email || '';
-                document.getElementById('notification-email').textContent = currentUser.email || '';
-                // Katta avatar uchun
-                document.getElementById('profile-picture-preview').src = currentUser.avatar ? currentUser.avatar.replace('/40?', '/100?') : `https://ui-avatars.com/api/?name=${currentUser?.name?.split(' ').map(n=>n[0]).join('') || '??'}&background=random&size=100`;
-                // Yon panel va headerdagi avatarni yangilash
-                if (sidebarAvatar) sidebarAvatar.src = currentUser.avatar || `https://ui-avatars.com/api/?name=${currentUser?.name?.split(' ').map(n=>n[0]).join('') || '??'}&background=random&size=40`;
-                if (headerAvatar) headerAvatar.src = currentUser.avatar || `https://ui-avatars.com/api/?name=${currentUser?.name?.split(' ').map(n=>n[0]).join('') || '??'}&background=random&size=40`;
-                // Yon paneldagi ism va rolni yangilash
-                if (sidebarUserName) sidebarUserName.textContent = currentUser.name || 'Foydalanuvchi';
-                const translatedRole = typeof roleTranslations !== 'undefined' ? roleTranslations[currentUser.role] : currentUser.role; // Rolni tarjima qilishga harakat qilish
-                if (sidebarUserRole) sidebarUserRole.textContent = translatedRole || 'Noma\'lum rol';
-
-                // TODO: Boshqa ma'lumotlarni (tel, tug'ilgan sana, bio) ham yuklash kerak
-                // document.getElementById('profile-phone').value = currentUser.phone || '';
-                // document.getElementById('profile-birthdate').value = currentUser.birthdate || '';
-                // document.getElementById('profile-bio').value = currentUser.bio || '';
-            } else {
-                console.error("Joriy foydalanuvchi ma'lumotlari topilmadi!");
-                // Agar foydalanuvchi topilmasa, bildirishnoma ko'rsatish
-                 if (typeof showToast === 'function') {
-                     showToast('Foydalanuvchi maʼlumotlarini yuklashda xatolik.', 'Xatolik', 'error'); // Tarjima qilindi
-                 }
-            }
-
-            // Bo'limlar orasida navigatsiya
-            const settingsLinks = document.querySelectorAll('.settings-menu a[href^="#"]');
-            const sections = document.querySelectorAll('.settings-section');
-
-            settingsLinks.forEach(link => {
-                 link.addEventListener('click', function(e) {
-                     e.preventDefault(); // Standart # o'tishni to'xtatish
-                     const targetId = this.getAttribute('href');
-                     const targetElement = document.querySelector(targetId);
-                     if (targetElement) {
-                         // Sekin o'tish
-                         targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                         // Menyuda aktiv holatni yangilash
-                         settingsLinks.forEach(l => l.classList.remove('active'));
-                         this.classList.add('active');
-                     }
-                 });
-             });
-
-            // Avatarni yuklash logikasi
-             const avatarUpload = document.getElementById('profile-picture-upload');
-             const avatarPreview = document.getElementById('profile-picture-preview');
-             if (avatarUpload && avatarPreview) {
-                 avatarUpload.addEventListener('change', function(e) {
-                     if (e.target.files && e.target.files[0]) {
-                         const reader = new FileReader();
-                         reader.onload = function(event) {
-                             const newSrc = event.target.result;
-                             avatarPreview.src = newSrc; // Asosiy previewni yangilash
-                             // Kichik avatarlarni ham yangilash (agar mavjud bo'lsa)
-                             if (sidebarAvatar) sidebarAvatar.src = newSrc; // Yon panel
-                             if (headerAvatar) headerAvatar.src = newSrc; // Header
-                             if(typeof showToast === 'function') showToast('Avatar yuklandi (mahalliy). Saqlash uchun "Profilni saqlash" tugmasini bosing.', 'Maʼlumot', 'info', 3000); // Tarjima qilindi
-                         }
-                         reader.readAsDataURL(e.target.files[0]); // Faylni o'qish
-                     }
-                 });
-             }
-
-             // Avatarni o'chirish logikasi
-              const removePicBtn = document.getElementById('remove-picture-btn');
-              if (removePicBtn && avatarPreview && currentUser) {
-                  removePicBtn.addEventListener('click', () => {
-                      // Initsiallar bo'yicha standart avatar yaratish
-                      const initials = currentUser?.name?.split(' ').map(n => n[0]).join('') || '??';
-                      const placeholderSrc100 = `https://ui-avatars.com/api/?name=${initials}&background=random&size=100&color=fff`;
-                      const placeholderSrc40 = `https://ui-avatars.com/api/?name=${initials}&background=random&size=40&color=fff`;
-
-                      avatarPreview.src = placeholderSrc100; // Asosiy preview
-                      if (sidebarAvatar) sidebarAvatar.src = placeholderSrc40; // Yon panel
-                      if (headerAvatar) headerAvatar.src = placeholderSrc40; // Header
-                      avatarUpload.value = null; // Fayl inputini tozalash
-                      if(typeof showToast === 'function') showToast('Avatar oʻchirildi (mahalliy). Saqlash uchun "Profilni saqlash" tugmasini bosing.', 'Maʼlumot', 'info', 3000); // Tarjima qilindi
-                  });
-              }
-
-             // Formalarni saqlash (demo)
-             const profileForm = document.getElementById('profile-form');
-             if (profileForm) {
-                 profileForm.addEventListener('submit', (e) => {
-                     e.preventDefault(); // Standart jo'natishni to'xtatish
-                     const newName = document.getElementById('profile-name').value;
-                     if (sidebarUserName) sidebarUserName.textContent = newName; // Yon paneldagi ismni yangilash
-                     // TODO: Backendga ma'lumotlarni jo'natish
-                      if(typeof showToast === 'function') showToast('Profil sozlamalari saqlandi (demo).', 'Muvaffaqiyatli', 'success'); // Tarjima qilindi
-                 });
-             }
-
-             const notificationsForm = document.getElementById('notifications-form');
-             if (notificationsForm) {
-                 notificationsForm.addEventListener('submit', (e) => {
-                     e.preventDefault();
-                     // TODO: Bildirishnoma sozlamalarini backendga jo'natish
-                      if(typeof showToast === 'function') showToast('Bildirishnoma sozlamalari saqlandi (demo).', 'Muvaffaqiyatli', 'success'); // Tarjima qilindi
-                 });
-             }
-
-             const privacyForm = document.getElementById('privacy-form');
-             if (privacyForm) {
-                 privacyForm.addEventListener('submit', (e) => {
-                     e.preventDefault();
-                     // TODO: Maxfiylik sozlamalarini backendga jo'natish
-                      if(typeof showToast === 'function') showToast('Maxfiylik sozlamalari saqlandi (demo).', 'Muvaffaqiyatli', 'success'); // Tarjima qilindi
-                 });
-             }
-
-             // Hisobni o'chirish tugmasi
-             const deleteAccountBtn = document.getElementById('delete-account-btn');
-             if (deleteAccountBtn) {
-                 deleteAccountBtn.addEventListener('click', () => {
-                     if (confirm('DIQQAT! Hisobingizni oʻchirib tashlamoqchimisiz? Bu amalni qaytarib boʻlmaydi.')) { // Tarjima qilindi
-                         if (confirm('SOʻNGGI OGOHLANTIRISH! Hisobni aniq oʻchirish kerakmi?')) { // Tarjima qilindi
-                             console.log("Hisobni o'chirish so'rovi (demo)");
-                              if(typeof showToast === 'function') showToast('Hisobni oʻchirish soʻrovi yuborildi (demo).', 'Hisobni oʻchirish', 'error', 7000); // Tarjima qilindi
-                             // TODO: Backendga o'chirish so'rovini jo'natish va tizimdan chiqarish
-                         }
-                     }
-                 });
-             }
-
-            // Scroll bo'lganda menyudagi aktiv bo'limni belgilash (Intersection Observer)
-             const observerOptions = {
-                 root: null, // viewport
-                 rootMargin: '-100px 0px -70% 0px', // Yuqoridan 100px, pastdan 70% ko'ringanda
-                 threshold: 0
-             };
-
-             const sectionObserver = new IntersectionObserver((entries) => {
-                 entries.forEach(entry => {
-                     if (entry.isIntersecting) { // Agar bo'lim ko'rinishda bo'lsa
-                         const id = entry.target.getAttribute('id');
-                         const activeLink = document.querySelector(`.settings-menu a[href="#${id}"]`);
-                         // Barcha linklardan 'active' klassini olib tashlash
-                         settingsLinks.forEach(l => l.classList.remove('active'));
-                         // Joriy ko'rinadigan bo'lim linkiga 'active' klassini qo'shish
-                         if(activeLink) activeLink.classList.add('active');
-                     }
-                 });
-             }, observerOptions);
-
-             // Har bir bo'limni kuzatish
-             sections.forEach(section => {
-                if(section) sectionObserver.observe(section);
-             });
-
-        });
-    </script>
-</body>
-</html>
+{% block extra_scripts %}
+<script>
+// Avatar preview (ixtiyoriy)
+document.getElementById('{{ profile_form.avatar.id_for_label }}')?.addEventListener('change', function(event) {
+    const preview = document.getElementById('avatar-preview');
+    const file = event.target.files[0];
+    if (file && preview) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+});
+</script>
 {% endblock %}
